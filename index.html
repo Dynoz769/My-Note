@@ -1,0 +1,558 @@
+<title>Team Notebook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: subject binder tabs on the left, one subject's assignments/tasks/notes as a due-date-ordered list on the right; stacks to a tab strip on phones. */
+:root {
+  --bg: #eef1f6; --surface: #ffffff; --surface-2: #f5f7fb; --ink: #172033; --muted: #5a6377; --line: #d8dde8;
+  --accent: #3446c4; --accent-ink: #ffffff; --hl: rgba(242, 207, 54, .55); --late: #c0362c; --ok: #2b8656;
+  --s0: #3446c4; --s1: #c0362c; --s2: #2b8656; --s3: #b26a00; --s4: #8a3fb8; --s5: #0f7c8c; --s6: #c2417f; --s7: #55607a;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f131b; --surface: #171c27; --surface-2: #1d2331; --ink: #e6e9f1; --muted: #99a2b5; --line: #2a3142;
+  --accent: #8d9bff; --accent-ink: #0f131b; --hl: rgba(232, 200, 62, .32); --late: #ff7d70; --ok: #5ccb8f;
+  --s0: #8d9bff; --s1: #ff7d70; --s2: #5ccb8f; --s3: #f0a640; --s4: #c48bf0; --s5: #4fc7d6; --s6: #f07db3; --s7: #a3abc0;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0f131b; --surface: #171c27; --surface-2: #1d2331; --ink: #e6e9f1; --muted: #99a2b5; --line: #2a3142;
+  --accent: #8d9bff; --accent-ink: #0f131b; --hl: rgba(232, 200, 62, .32); --late: #ff7d70; --ok: #5ccb8f;
+  --s0: #8d9bff; --s1: #ff7d70; --s2: #5ccb8f; --s3: #f0a640; --s4: #c48bf0; --s5: #4fc7d6; --s6: #f07db3; --s7: #a3abc0;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--f-body); }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 20px 48px; }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.brand { font: 800 26px/1.1 var(--f-display); letter-spacing: -.02em; margin: 0; }
+.brand small { display: block; font: 500 12px/1.4 var(--f-mono); color: var(--muted); letter-spacing: .04em; text-transform: uppercase; margin-top: 4px; }
+.me { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
+.me img { width: 28px; height: 28px; border-radius: 50%; }
+
+.grid { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 20px; align-items: start; }
+
+/* Subject tabs */
+.side { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); display: grid; gap: 14px; }
+.label { font: 500 11px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.tabs { display: grid; gap: 2px; }
+.tab { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; align-items: center; gap: 10px; width: 100%; text-align: left;
+  padding: 9px 10px; border: 0; border-radius: 8px; background: transparent; }
+.tab:hover { background: var(--surface-2); }
+.tab[aria-current="true"] { background: var(--surface); box-shadow: 0 0 0 1px var(--line); }
+.tab .dot { width: 10px; height: 10px; border-radius: 3px; background: var(--c, var(--ink)); }
+.tab .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+.tab .code { font: 500 11px var(--f-mono); color: var(--muted); margin-left: 6px; }
+.tab .n { font: 500 12px var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.addsub { display: grid; gap: 8px; padding: 12px; border: 1px dashed var(--line); border-radius: var(--r); }
+.addsub .row { display: grid; grid-template-columns: minmax(0, 1fr) 84px; gap: 6px; }
+.field { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); min-width: 0; }
+.field::placeholder { color: var(--muted); opacity: .8; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 14px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--surface); font-weight: 600; font-size: 14px; white-space: nowrap; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.danger { color: var(--late); }
+.btn.danger.solid { background: var(--late); color: var(--surface); border-color: var(--late); }
+.btn.ghost { border-color: transparent; background: transparent; color: var(--muted); }
+.btn.ghost:hover { color: var(--ink); background: var(--surface-2); }
+.btn:disabled { opacity: .5; cursor: default; }
+
+/* Main column */
+.main { min-width: 0; display: grid; gap: 14px; }
+.head { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; display: grid; gap: 14px;
+  border-top: 5px solid var(--c, var(--accent)); }
+.head h2 { margin: 0; font: 800 clamp(24px, 4vw, 34px)/1.05 var(--f-display); letter-spacing: -.02em; text-wrap: balance; }
+.head .code { font: 500 13px var(--f-mono); color: var(--muted); }
+.head-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+.stat { display: grid; gap: 2px; }
+.stat b { font: 600 22px/1 var(--f-display); font-variant-numeric: tabular-nums; }
+.stat.late b { color: var(--late); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px; }
+.seg button { border: 0; background: transparent; padding: 5px 11px; border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 0 0 1px var(--line); }
+.tools-l { display: flex; flex-wrap: wrap; gap: 8px; }
+.confirm { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 12px; border-radius: 8px; background: var(--surface-2); font-size: 14px; }
+
+/* Items */
+.list { display: grid; gap: 8px; }
+.card { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; padding: 14px 16px; background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--r); }
+.card.done { background: var(--surface-2); }
+.card.done .ttl { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
+.status { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--muted); background: transparent; display: grid; place-items: center; padding: 0; margin-top: 1px; }
+.status[data-s="doing"] { border-color: var(--accent); background: conic-gradient(var(--accent) 0 50%, transparent 50% 100%); }
+.status[data-s="done"] { border-color: var(--ok); background: var(--ok); }
+.status[data-s="done"]::after { content: ""; width: 10px; height: 5px; border: 2px solid var(--surface); border-top: 0; border-right: 0; transform: translateY(-1px) rotate(-45deg); }
+.status:disabled { cursor: default; }
+.body { min-width: 0; display: grid; gap: 6px; }
+.line1 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
+.ttl { font-weight: 600; font-size: 16px; border: 0; background: none; padding: 0; text-align: left; min-width: 0; overflow-wrap: anywhere; }
+.ttl:hover { color: var(--accent); }
+.kind { font: 500 10.5px/1 var(--f-mono); letter-spacing: .07em; text-transform: uppercase; padding: 4px 6px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); }
+.kind.assignment { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: 13px; color: var(--muted); }
+.due { font: 500 12.5px var(--f-mono); font-variant-numeric: tabular-nums; }
+.due.soon { color: var(--ink); background: linear-gradient(transparent 45%, var(--hl) 45%, var(--hl) 92%, transparent 92%); padding-inline: 2px; }
+.due.late { color: var(--late); }
+.subj { display: inline-flex; align-items: center; gap: 5px; }
+.subj i { width: 8px; height: 8px; border-radius: 2px; background: var(--c); }
+.ppl { display: inline-flex; align-items: center; }
+.ppl img { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--surface); margin-left: -6px; background: var(--surface-2); }
+.ppl img:first-child { margin-left: 0; }
+.note { color: var(--muted); font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.note.open { -webkit-line-clamp: unset; display: block; }
+.more { justify-self: start; border: 0; background: none; padding: 0; font-size: 13px; color: var(--accent); font-weight: 500; }
+
+.empty { text-align: center; padding: 40px 20px; border: 1px dashed var(--line); border-radius: 14px; color: var(--muted); display: grid; gap: 10px; justify-items: center; }
+.empty h3 { margin: 0; color: var(--ink); font: 600 20px var(--f-display); }
+.empty p { margin: 0; max-width: 46ch; }
+.notice { padding: 12px 14px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); font-size: 14px; color: var(--muted); }
+
+/* Editor */
+.overlay { position: fixed; inset: 0; background: rgba(10, 14, 24, .45); display: grid; place-items: center; padding: 16px; z-index: 20; overflow-y: auto; }
+.sheet { width: min(620px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: grid; gap: 14px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25); max-height: calc(100% - 8px); overflow-y: auto; }
+.sheet h3 { margin: 0; font: 800 22px var(--f-display); letter-spacing: -.01em; }
+.f { display: grid; gap: 5px; }
+.f > span { font-size: 13px; font-weight: 600; color: var(--muted); }
+.frow { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+textarea.field { min-height: 140px; resize: vertical; line-height: 1.5; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 4px 3px 3px; border-radius: 99px; background: var(--surface-2); border: 1px solid var(--line); font-size: 13px; }
+.chip img { width: 20px; height: 20px; border-radius: 50%; }
+.chip button { border: 0; background: none; padding: 0 6px; color: var(--muted); font-size: 15px; line-height: 1; }
+.picker { position: relative; }
+.results { position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 4px; z-index: 2; box-shadow: 0 8px 24px rgba(0,0,0,.15); display: grid; }
+.results button { display: flex; align-items: center; gap: 8px; border: 0; background: none; padding: 7px 8px; border-radius: 6px; text-align: left; }
+.results button:hover, .results button:focus-visible { background: var(--surface-2); }
+.results img { width: 22px; height: 22px; border-radius: 50%; }
+.sheet-foot { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; }
+.sheet-foot .r { display: flex; gap: 8px; margin-left: auto; }
+.by { font-size: 12.5px; color: var(--muted); }
+
+.toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); transform: translateX(-50%); background: var(--ink); color: var(--bg);
+  padding: 10px 16px; border-radius: 10px; font-size: 14px; z-index: 30; max-width: calc(100% - 32px); }
+
+@media (max-width: 760px) {
+  .wrap { padding-inline: 16px; }
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .side { position: static; }
+  .tabs { display: flex; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
+  .tab { width: auto; flex: none; grid-template-columns: 10px auto auto; background: var(--surface); box-shadow: 0 0 0 1px var(--line); }
+  .tab[aria-current="true"] { box-shadow: 0 0 0 2px var(--c, var(--accent)); }
+  .tab .code { display: none; }
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1 class="brand">Team Notebook<small>Assignments · tasks · notes, by subject</small></h1>
+    <div class="me" id="me"></div>
+  </header>
+  <div class="grid">
+    <aside class="side" id="side"></aside>
+    <main class="main" id="main"></main>
+  </div>
+</div>
+<div id="editor"></div>
+<div id="toast" class="toast" role="status" hidden></div>
+
+<script>
+(() => {
+  const KINDS = { assignment: 'Assignment', task: 'Task', note: 'Note' };
+  const STATUS = ['todo', 'doing', 'done'];
+  const STATUS_LABEL = { todo: 'To do', doing: 'In progress', done: 'Done' };
+  const use = n => (window.claude && window.claude.use) ? window.claude.use(n) : Promise.resolve(null);
+
+  const S = {
+    db: null, user: null, meId: null, canWrite: null, readOnly: false, unavailable: false,
+    subjects: [], items: [], subjReady: false, itemsReady: false,
+    sel: 'all', kind: 'all', show: 'open', confirmDel: false, expanded: new Set(),
+  };
+  try {
+    const p = JSON.parse(localStorage.getItem('tn-prefs') || '{}');
+    if (p.sel) S.sel = p.sel; if (p.kind) S.kind = p.kind; if (p.show) S.show = p.show;
+  } catch (e) {}
+  const savePrefs = () => { try { localStorage.setItem('tn-prefs', JSON.stringify({ sel: S.sel, kind: S.kind, show: S.show })); } catch (e) {} };
+
+  const $ = id => document.getElementById(id);
+  function h(tag, attrs, ...kids) {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (v == null || v === false) continue;
+      if (k === 'class') el.className = v;
+      else if (k === 'text') el.textContent = v;
+      else if (k === 'style') el.style.cssText = v;
+      else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? '' : v);
+    }
+    for (const kid of kids.flat()) {
+      if (kid == null || kid === false) continue;
+      el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+    }
+    return el;
+  }
+
+  let toastT;
+  function toast(msg) {
+    const t = $('toast'); t.textContent = msg; t.hidden = false;
+    clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 3200);
+  }
+  function writeErr(e) {
+    const code = e && e.code;
+    if (code === 'invalid_argument') { S.readOnly = true; render(); toast('You can view this board but not edit it. Ask the owner for Contributor access.'); }
+    else if (code === 'quota_exceeded') toast('The notebook is full. Delete some old items, then try again.');
+    else if (code === 'resource_exhausted') toast('Too many changes at once. Wait a moment and try again.');
+    else toast('That change did not save. Check your connection and try again.');
+  }
+  const canEdit = () => !!S.db && !S.readOnly && S.canWrite !== false;
+
+  const subjById = id => S.subjects.find(s => s.id === id);
+  const subjColor = s => `var(--s${(s && Number.isInteger(s.color) ? s.color : 7) % 8})`;
+
+  function dueInfo(due, done) {
+    if (!due) return null;
+    const [y, m, d] = due.split('-').map(Number);
+    if (!y || !m || !d) return null;
+    const t = new Date(y, m - 1, d);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const days = Math.round((t - today) / 86400000);
+    const dateStr = t.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+    if (done) return { days, label: dateStr, tone: '' };
+    if (days < 0) return { days, label: `${-days} day${days === -1 ? '' : 's'} overdue`, tone: 'late' };
+    if (days === 0) return { days, label: 'Due today', tone: 'soon' };
+    if (days === 1) return { days, label: 'Due tomorrow', tone: 'soon' };
+    if (days <= 7) return { days, label: `Due in ${days} days · ${dateStr}`, tone: 'soon' };
+    return { days, label: `Due ${dateStr}`, tone: '' };
+  }
+
+  async function fillPeople(root) {
+    if (!S.user) return;
+    const els = [...root.querySelectorAll('[data-uid]')];
+    const ids = [...new Set(els.map(e => e.dataset.uid))];
+    if (!ids.length) return;
+    const ps = await S.user.profiles(ids);
+    for (const e of els) {
+      const p = ps[e.dataset.uid]; if (!p) continue;
+      const nm = p.isMe ? 'You' : (p.name || 'Teammate');
+      if (e.tagName === 'IMG') { e.src = p.avatarUrl; e.alt = nm; e.title = nm; }
+      else e.textContent = nm;
+    }
+  }
+
+  // ---------- Sidebar ----------
+  function renderSide() {
+    const side = $('side'); side.replaceChildren();
+    const openCount = sid => S.items.filter(i => i.status !== 'done' && (sid === 'all' || i.subjectId === sid)).length;
+    const tab = (id, name, code, color) => h('button', {
+      class: 'tab', 'aria-current': String(S.sel === id), style: color ? `--c:${color}` : null,
+      onclick: () => { S.sel = id; S.confirmDel = false; savePrefs(); render(); }
+    }, h('span', { class: 'dot' }), h('span', { class: 'nm' }, name, code ? h('span', { class: 'code', text: code }) : null),
+       h('span', { class: 'n', text: S.itemsReady ? openCount(id) : '' }));
+
+    side.append(h('div', { class: 'label', text: 'Subjects' }));
+    const tabs = h('nav', { class: 'tabs', 'aria-label': 'Subjects' }, tab('all', 'All subjects', '', 'var(--ink)'));
+    for (const s of S.subjects) tabs.append(tab(s.id, s.name, s.code, subjColor(s)));
+    side.append(tabs);
+
+    if (canEdit()) {
+      const name = h('input', { class: 'field', id: 'new-subj-name', placeholder: 'Subject name', maxlength: '60', 'aria-label': 'Subject name' });
+      const code = h('input', { class: 'field', id: 'new-subj-code', placeholder: 'Code', maxlength: '12', 'aria-label': 'Subject code' });
+      const form = h('form', { class: 'addsub', onsubmit: async ev => {
+        ev.preventDefault();
+        const n = name.value.trim(); if (!n) { name.focus(); return; }
+        const used = new Set(S.subjects.map(s => s.color));
+        let color = 0; while (used.has(color) && color < 7) color++;
+        if (used.has(color)) color = S.subjects.length % 8;
+        try {
+          const ref = await S.db.collection('subjects').add({ name: n, code: code.value.trim().toUpperCase(), color, createdBy: S.meId, createdAt: new Date().toISOString() });
+          name.value = ''; code.value = ''; S.sel = ref.id; savePrefs(); toast(`Added ${n}`); render();
+        } catch (e) { writeErr(e); }
+      } }, h('div', { class: 'label', text: 'Add a subject' }), h('div', { class: 'row' }, name, code), h('button', { class: 'btn', type: 'submit', text: 'Add subject' }));
+      side.append(form);
+    }
+  }
+
+  // ---------- Main ----------
+  function filtered() {
+    let list = S.items.filter(i => S.sel === 'all' || i.subjectId === S.sel);
+    if (S.kind !== 'all') list = list.filter(i => i.kind === S.kind);
+    if (S.show === 'open') list = list.filter(i => i.status !== 'done');
+    if (S.show === 'done') list = list.filter(i => i.status === 'done');
+    return list.sort((a, b) => {
+      const ad = a.status === 'done', bd = b.status === 'done';
+      if (ad !== bd) return ad ? 1 : -1;
+      if (ad) return (b.updatedAt || '').localeCompare(a.updatedAt || '');
+      if (!!a.due !== !!b.due) return a.due ? -1 : 1;
+      if (a.due && b.due && a.due !== b.due) return a.due.localeCompare(b.due);
+      return (b.updatedAt || '').localeCompare(a.updatedAt || '');
+    });
+  }
+
+  function renderMain() {
+    const main = $('main'); main.replaceChildren();
+
+    if (S.unavailable) {
+      main.append(h('div', { class: 'empty' }, h('h3', { text: 'Sign in to open your team’s notebook' }),
+        h('p', { text: 'The notebook is shared through claude.ai. Open this page while signed in to see and add subjects, assignments, tasks and notes.' })));
+      return;
+    }
+    if (!S.subjReady || !S.itemsReady) {
+      main.append(h('div', { class: 'notice', text: 'Loading your team’s notebook…' }));
+      return;
+    }
+    if (S.sel !== 'all' && !subjById(S.sel)) S.sel = 'all';
+    if (!S.subjects.length) {
+      main.append(h('div', { class: 'empty' }, h('h3', { text: 'Start with your first subject' }),
+        h('p', { text: canEdit()
+          ? 'Add each class your team takes, like Mathematics (MAT101) or Software Engineering (CSC2204). Then add assignments, tasks and notes under it. Everyone on the team sees changes live.'
+          : 'No subjects yet. Once a teammate adds one, it shows up here.' })));
+      return;
+    }
+
+    const subj = S.sel === 'all' ? null : subjById(S.sel);
+    const scope = S.items.filter(i => !subj || i.subjectId === subj.id);
+    const open = scope.filter(i => i.status !== 'done');
+    const late = open.filter(i => { const d = dueInfo(i.due); return d && d.days < 0; }).length;
+    const week = open.filter(i => { const d = dueInfo(i.due); return d && d.days >= 0 && d.days <= 7; }).length;
+    const assignments = open.filter(i => i.kind === 'assignment').length;
+
+    const head = h('section', { class: 'head', style: `--c:${subj ? subjColor(subj) : 'var(--accent)'}` });
+    const titleBox = h('div', {}, h('h2', { text: subj ? subj.name : 'All subjects' }),
+      subj && subj.code ? h('div', { class: 'code', text: subj.code }) : h('div', { class: 'code', text: subj ? '' : `${S.subjects.length} subject${S.subjects.length === 1 ? '' : 's'}` }));
+    const headActs = h('div', { class: 'tools-l' });
+    if (canEdit()) {
+      headActs.append(h('button', { class: 'btn primary', onclick: () => openEditor(null), text: '+ New' }));
+      if (subj) headActs.append(h('button', { class: 'btn ghost', onclick: () => { S.confirmDel = true; render(); }, text: 'Delete subject' }));
+    }
+    head.append(h('div', { class: 'head-top' }, titleBox, headActs));
+    head.append(h('div', { class: 'stats' },
+      h('div', { class: 'stat' }, h('b', { text: open.length }), h('span', { class: 'label', text: 'Open' })),
+      h('div', { class: 'stat' }, h('b', { text: assignments }), h('span', { class: 'label', text: 'Assignments open' })),
+      h('div', { class: 'stat' }, h('b', { text: week }), h('span', { class: 'label', text: 'Due in 7 days' })),
+      h('div', { class: 'stat' + (late ? ' late' : '') }, h('b', { text: late }), h('span', { class: 'label', text: 'Overdue' }))));
+
+    if (subj && S.confirmDel) {
+      const n = scope.length;
+      head.append(h('div', { class: 'confirm' },
+        h('span', { text: `Delete ${subj.name}${n ? ` and its ${n} item${n === 1 ? '' : 's'}` : ''}? This cannot be undone.` }),
+        h('button', { class: 'btn danger solid', onclick: async ev => {
+          ev.currentTarget.disabled = true;
+          try {
+            for (const i of scope) await S.db.doc('items/' + i.id).delete();
+            await S.db.doc('subjects/' + subj.id).delete();
+            S.sel = 'all'; S.confirmDel = false; savePrefs(); toast(`Deleted ${subj.name}`); render();
+          } catch (e) { writeErr(e); }
+        }, text: 'Delete' }),
+        h('button', { class: 'btn', onclick: () => { S.confirmDel = false; render(); }, text: 'Keep it' })));
+    }
+
+    const seg = (key, opts) => h('div', { class: 'seg', role: 'group' }, opts.map(([v, l]) =>
+      h('button', { 'aria-pressed': String(S[key] === v), onclick: () => { S[key] = v; savePrefs(); render(); }, text: l })));
+    head.append(h('div', { class: 'toolbar' },
+      seg('kind', [['all', 'Everything'], ['assignment', 'Assignments'], ['task', 'Tasks'], ['note', 'Notes']]),
+      seg('show', [['open', 'Open'], ['done', 'Done'], ['all', 'All']])));
+    main.append(head);
+
+    const items = filtered();
+    if (!items.length) {
+      const what = S.kind === 'all' ? 'items' : KINDS[S.kind].toLowerCase() + 's';
+      main.append(h('div', { class: 'empty' },
+        h('h3', { text: S.show === 'done' ? `No finished ${what} yet` : `No open ${what}` }),
+        h('p', { text: canEdit() ? 'Use + New to add an assignment with a due date, split it into tasks for each teammate, or keep lecture notes here.' : 'Nothing here yet.' }),
+        canEdit() ? h('button', { class: 'btn primary', onclick: () => openEditor(null), text: '+ New' }) : null));
+      return;
+    }
+
+    const list = h('div', { class: 'list' });
+    for (const it of items) list.append(card(it, !subj));
+    main.append(list);
+    fillPeople(main);
+  }
+
+  function card(it, showSubj) {
+    const done = it.status === 'done';
+    const st = STATUS.includes(it.status) ? it.status : 'todo';
+    const d = it.kind === 'note' && !it.due ? null : dueInfo(it.due, done);
+    const s = subjById(it.subjectId);
+    const next = STATUS[(STATUS.indexOf(st) + 1) % STATUS.length];
+    const statusBtn = h('button', {
+      class: 'status', 'data-s': st, disabled: !canEdit(),
+      'aria-label': `${STATUS_LABEL[st]}. ${canEdit() ? 'Mark as ' + STATUS_LABEL[next] : ''}`, title: STATUS_LABEL[st],
+      onclick: async () => {
+        try { await S.db.doc('items/' + it.id).update({ status: next, updatedAt: new Date().toISOString() }); }
+        catch (e) { writeErr(e); }
+      }
+    });
+    const meta = h('div', { class: 'meta' });
+    if (showSubj && s) meta.append(h('span', { class: 'subj', style: `--c:${subjColor(s)}` }, h('i'), s.code || s.name));
+    if (d) meta.append(h('span', { class: 'due ' + d.tone, text: d.label }));
+    if (st === 'doing') meta.append(h('span', { text: 'In progress' }));
+    if (it.kind === 'assignment' && it.weight) meta.append(h('span', { text: `${it.weight}% of grade` }));
+    const ids = Array.isArray(it.assignees) ? it.assignees : [];
+    if (ids.length) meta.append(h('span', { class: 'ppl' }, ids.map(u => h('img', { 'data-uid': u, alt: '' }))));
+
+    const bodyEl = h('div', { class: 'body' },
+      h('div', { class: 'line1' },
+        h('button', { class: 'ttl', onclick: () => openEditor(it), text: it.title || 'Untitled' }),
+        h('span', { class: 'kind ' + (it.kind || 'note'), text: KINDS[it.kind] || 'Note' })),
+      meta.childNodes.length ? meta : null);
+    if (it.body) {
+      const isOpen = S.expanded.has(it.id);
+      const note = h('div', { class: 'note' + (isOpen ? ' open' : ''), text: it.body });
+      bodyEl.append(note);
+      if (it.body.length > 180 || it.body.split('\n').length > 3) {
+        bodyEl.append(h('button', { class: 'more', onclick: () => { isOpen ? S.expanded.delete(it.id) : S.expanded.add(it.id); render(); }, text: isOpen ? 'Show less' : 'Show more' }));
+      }
+    }
+    return h('article', { class: 'card' + (done ? ' done' : '') }, statusBtn, bodyEl);
+  }
+
+  // ---------- Editor ----------
+  function openEditor(it) {
+    const edit = canEdit();
+    const isNew = !it;
+    const v = it ? { ...it, assignees: [...(it.assignees || [])] }
+      : { kind: S.kind !== 'all' ? S.kind : 'assignment', title: '', body: '', due: '', weight: '', status: 'todo', assignees: [], subjectId: S.sel !== 'all' ? S.sel : (S.subjects[0] && S.subjects[0].id) };
+    const root = $('editor');
+    const close = () => { root.replaceChildren(); document.removeEventListener('keydown', onKey); };
+    const onKey = e => { if (e.key === 'Escape') close(); };
+    document.addEventListener('keydown', onKey);
+
+    const kindSeg = h('div', { class: 'seg', role: 'group', 'aria-label': 'Type' });
+    const drawKind = () => {
+      kindSeg.replaceChildren(...Object.entries(KINDS).map(([k, l]) => h('button', { type: 'button', 'aria-pressed': String(v.kind === k), disabled: !edit,
+        onclick: () => { v.kind = k; drawKind(); weightF.hidden = k !== 'assignment'; } , text: l })));
+    };
+    const title = h('input', { class: 'field', id: 'ed-title', value: v.title, placeholder: 'e.g. Lab report 2: Ohm’s law', maxlength: '140', required: true, disabled: !edit });
+    const subjSel = h('select', { class: 'field', id: 'ed-subject', disabled: !edit },
+      S.subjects.map(s => h('option', { value: s.id, selected: s.id === v.subjectId, text: s.code ? `${s.name} (${s.code})` : s.name })));
+    const due = h('input', { class: 'field', id: 'ed-due', type: 'date', value: v.due || '', disabled: !edit });
+    const status = h('select', { class: 'field', id: 'ed-status', disabled: !edit }, STATUS.map(s => h('option', { value: s, selected: s === v.status, text: STATUS_LABEL[s] })));
+    const weight = h('input', { class: 'field', id: 'ed-weight', type: 'number', min: '0', max: '100', step: '1', value: v.weight || '', placeholder: 'e.g. 20', disabled: !edit });
+    const weightF = h('label', { class: 'f' }, h('span', { text: 'Weight (% of grade)' }), weight);
+    weightF.hidden = v.kind !== 'assignment';
+    const body = h('textarea', { class: 'field', id: 'ed-body', placeholder: 'Instructions, lecturer’s requirements, links, who does which part, meeting notes…', disabled: !edit });
+    body.value = v.body || '';
+
+    // Assignees
+    const chips = h('div', { class: 'chips' });
+    const drawChips = () => {
+      chips.replaceChildren(...v.assignees.map(u => h('span', { class: 'chip' }, h('img', { 'data-uid': u, alt: '' }), h('span', { 'data-uid': u, text: '…' }),
+        edit ? h('button', { type: 'button', 'aria-label': 'Remove', onclick: () => { v.assignees = v.assignees.filter(x => x !== u); drawChips(); }, text: '×' }) : null)));
+      if (!v.assignees.length) chips.append(h('span', { class: 'by', text: 'Nobody yet' }));
+      fillPeople(chips);
+    };
+    const results = h('div', { class: 'results', hidden: true });
+    const search = h('input', { class: 'field', id: 'ed-people', placeholder: 'Add a teammate by name', autocomplete: 'off', disabled: !edit || !S.user });
+    const runSearch = async () => {
+      if (!S.user) return;
+      const hits = (await S.user.search(search.value.trim())).filter(p => !v.assignees.includes(p.id));
+      results.replaceChildren(...hits.map(p => h('button', { type: 'button', onclick: () => { v.assignees.push(p.id); search.value = ''; results.hidden = true; drawChips(); } },
+        h('img', { src: p.avatarUrl, alt: '' }), h('span', { text: p.isMe ? `${p.name || 'You'} (you)` : (p.name || 'Teammate') }))));
+      results.hidden = !hits.length || document.activeElement !== search;
+    };
+    search.addEventListener('focus', runSearch);
+    search.addEventListener('input', runSearch);
+    search.addEventListener('blur', () => setTimeout(() => { results.hidden = true; }, 150));
+    const assignMe = S.meId && edit ? h('button', { class: 'btn ghost', type: 'button', onclick: () => { if (!v.assignees.includes(S.meId)) { v.assignees.push(S.meId); drawChips(); } }, text: 'Assign me' }) : null;
+
+    const foot = h('div', { class: 'sheet-foot' });
+    const saveBtn = h('button', { class: 'btn primary', type: 'submit', text: isNew ? 'Add' : 'Save' });
+    const drawFoot = (confirming) => {
+      foot.replaceChildren();
+      if (confirming) {
+        foot.append(h('span', { text: 'Delete this for the whole team?' }), h('div', { class: 'r' },
+          h('button', { class: 'btn', type: 'button', onclick: () => drawFoot(false), text: 'Keep it' }),
+          h('button', { class: 'btn danger solid', type: 'button', onclick: async () => {
+            try { await S.db.doc('items/' + it.id).delete(); close(); toast('Deleted'); } catch (e) { writeErr(e); }
+          }, text: 'Delete' })));
+        return;
+      }
+      if (!isNew && edit) foot.append(h('button', { class: 'btn danger', type: 'button', onclick: () => drawFoot(true), text: 'Delete' }));
+      foot.append(h('div', { class: 'r' }, h('button', { class: 'btn', type: 'button', onclick: close, text: edit ? 'Cancel' : 'Close' }), edit ? saveBtn : null));
+    };
+    drawFoot(false);
+
+    const form = h('form', { class: 'sheet', role: 'dialog', 'aria-modal': 'true', 'aria-label': isNew ? 'New item' : 'Edit item', onsubmit: async ev => {
+      ev.preventDefault();
+      if (!edit) return;
+      const t = title.value.trim(); if (!t) { title.focus(); return; }
+      if (!subjSel.value) { toast('Add a subject first.'); return; }
+      const w = parseInt(weight.value, 10);
+      const data = {
+        kind: v.kind, title: t, subjectId: subjSel.value, due: due.value || null, status: status.value,
+        weight: v.kind === 'assignment' && w >= 0 && w <= 100 ? w : null,
+        assignees: v.assignees, body: body.value, updatedAt: new Date().toISOString(),
+      };
+      saveBtn.disabled = true;
+      try {
+        if (isNew) await S.db.collection('items').add({ ...data, createdBy: S.meId, createdAt: data.updatedAt });
+        else await S.db.doc('items/' + it.id).update(data);
+        close(); toast(isNew ? `Added ${KINDS[v.kind].toLowerCase()}` : 'Saved');
+      } catch (e) { saveBtn.disabled = false; writeErr(e); }
+    } },
+      h('h3', { text: isNew ? 'New item' : (edit ? 'Edit item' : v.title) }),
+      kindSeg,
+      h('label', { class: 'f' }, h('span', { text: 'Title' }), title),
+      h('div', { class: 'frow' },
+        h('label', { class: 'f' }, h('span', { text: 'Subject' }), subjSel),
+        h('label', { class: 'f' }, h('span', { text: 'Due date' }), due)),
+      h('div', { class: 'frow' },
+        h('label', { class: 'f' }, h('span', { text: 'Status' }), status),
+        weightF),
+      h('div', { class: 'f' }, h('span', { text: 'Who’s on it' }), chips,
+        edit && S.user ? h('div', { style: 'display:flex;gap:6px;align-items:center' }, h('div', { class: 'picker', style: 'flex:1;min-width:0' }, search, results), assignMe) : null),
+      h('label', { class: 'f' }, h('span', { text: 'Notes' }), body),
+      !isNew && it.createdBy ? h('div', { class: 'by' }, 'Added by ', h('span', { 'data-uid': it.createdBy, text: '…' }),
+        it.updatedAt ? ` · last changed ${new Date(it.updatedAt).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })}` : '') : null,
+      foot);
+
+    drawKind(); drawChips();
+    const overlay = h('div', { class: 'overlay', onclick: e => { if (e.target === overlay) close(); } }, form);
+    root.replaceChildren(overlay);
+    fillPeople(form);
+    if (edit) title.focus();
+  }
+
+  // ---------- Boot ----------
+  function render() { renderSide(); renderMain(); }
+
+  async function boot() {
+    render();
+    const [db, user] = await Promise.all([use('db'), use('user')]);
+    S.user = user;
+    if (!db) { S.unavailable = true; render(); return; }
+    S.db = db;
+    if (user) {
+      const [me, can] = await Promise.all([user.me(), user.can('data.write')]);
+      S.meId = me.id; S.canWrite = can;
+      $('me').replaceChildren(h('img', { src: me.avatarUrl, alt: '' }), h('span', { text: me.name || 'You' }));
+    }
+    const onErr = e => { if (e && e.code === 'revoked') { S.unavailable = true; render(); } else toast('Lost connection to the notebook. Reload the page to reconnect.'); };
+    db.collection('subjects').onSnapshot(snap => {
+      S.subjects = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
+      S.subjReady = true; render();
+    }, onErr);
+    db.collection('items').onSnapshot(snap => {
+      S.items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      S.itemsReady = true; render();
+    }, onErr);
+  }
+  boot();
+})();
+</script>
