@@ -1,324 +1,328 @@
 <title>Team Notebook</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: subject binder tabs on the left; on the right a quick-add bar, the next-deadline countdown, then the subject's work as a list, a status board or a month calendar. Item details open in a side drawer. Stacks on phones. */
+/* Layout: quiet sidebar of subjects; main column = title, one-line summary, add bar, plain rows. One accent colour; subject colours only as small dots. Details open in a side drawer. */
 :root {
-  --bg: #eef1f6; --surface: #ffffff; --surface-2: #f5f7fb; --ink: #172033; --muted: #5a6377; --line: #d8dde8;
-  --accent: #3446c4; --accent-ink: #ffffff; --hl: rgba(242, 207, 54, .55); --late: #c0362c; --ok: #2b8656;
-  --scrim: rgba(10, 14, 24, .45); --shadow: rgba(16, 24, 40, .18);
-  --s0: #3446c4; --s1: #c0362c; --s2: #2b8656; --s3: #b26a00; --s4: #8a3fb8; --s5: #0f7c8c; --s6: #c2417f; --s7: #55607a;
-  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
-  --f-body: "Figtree", "Segoe UI", system-ui, sans-serif;
-  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-  --r: 10px;
+  --bg: #fbfbfa; --surface: #ffffff; --hover: #f2f2f0; --ink: #1d1e22; --muted: #74767d; --faint: #a3a5ab; --line: #ebebe8;
+  --accent: #2f5bea; --accent-ink: #ffffff; --late: #d1403a; --ok: #2e8b57; --scrim: rgba(20, 20, 24, .32); --shadow: rgba(20, 20, 24, .12);
+  --s0: #2f5bea; --s1: #d1403a; --s2: #2e8b57; --s3: #c27a12; --s4: #8a4fc4; --s5: #148a99; --s6: #c7487f; --s7: #6b6e78;
+  --f: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #0f131b; --surface: #171c27; --surface-2: #1d2331; --ink: #e6e9f1; --muted: #99a2b5; --line: #2a3142;
-  --accent: #8d9bff; --accent-ink: #0f131b; --hl: rgba(232, 200, 62, .32); --late: #ff7d70; --ok: #5ccb8f;
-  --scrim: rgba(0, 0, 0, .6); --shadow: rgba(0, 0, 0, .5);
-  --s0: #8d9bff; --s1: #ff7d70; --s2: #5ccb8f; --s3: #f0a640; --s4: #c48bf0; --s5: #4fc7d6; --s6: #f07db3; --s7: #a3abc0;
+  --bg: #141416; --surface: #1b1b1e; --hover: #232327; --ink: #ececee; --muted: #9a9ca3; --faint: #6c6e75; --line: #2a2a2f;
+  --accent: #7f9cff; --accent-ink: #141416; --late: #ff7b72; --ok: #5cc98e; --scrim: rgba(0, 0, 0, .55); --shadow: rgba(0, 0, 0, .45);
+  --s0: #7f9cff; --s1: #ff7b72; --s2: #5cc98e; --s3: #f0a640; --s4: #c48bf0; --s5: #4fc7d6; --s6: #f07db3; --s7: #a3a6b0;
   color-scheme: dark; } }
 :root[data-theme="dark"] {
-  --bg: #0f131b; --surface: #171c27; --surface-2: #1d2331; --ink: #e6e9f1; --muted: #99a2b5; --line: #2a3142;
-  --accent: #8d9bff; --accent-ink: #0f131b; --hl: rgba(232, 200, 62, .32); --late: #ff7d70; --ok: #5ccb8f;
-  --scrim: rgba(0, 0, 0, .6); --shadow: rgba(0, 0, 0, .5);
-  --s0: #8d9bff; --s1: #ff7d70; --s2: #5ccb8f; --s3: #f0a640; --s4: #c48bf0; --s5: #4fc7d6; --s6: #f07db3; --s7: #a3abc0;
+  --bg: #141416; --surface: #1b1b1e; --hover: #232327; --ink: #ececee; --muted: #9a9ca3; --faint: #6c6e75; --line: #2a2a2f;
+  --accent: #7f9cff; --accent-ink: #141416; --late: #ff7b72; --ok: #5cc98e; --scrim: rgba(0, 0, 0, .55); --shadow: rgba(0, 0, 0, .45);
+  --s0: #7f9cff; --s1: #ff7b72; --s2: #5cc98e; --s3: #f0a640; --s4: #c48bf0; --s5: #4fc7d6; --s6: #f07db3; --s7: #a3a6b0;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--f-body); }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--f); }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
-a { color: var(--accent); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
-svg.i { width: 15px; height: 15px; flex: none; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -2px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+svg.i { width: 16px; height: 16px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
-.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 20px; padding-block: 18px 56px; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 24px; padding-block: 20px 64px; }
+.top { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+.brand { font-size: 16px; font-weight: 700; margin: 0; letter-spacing: -.01em; }
+.top .sp { flex: 1; }
+.search { display: flex; align-items: center; gap: 6px; padding: 0 10px; border-radius: 8px; background: var(--hover); color: var(--muted); width: min(240px, 100%); }
+.search input { border: 0; background: none; padding: 7px 0; min-width: 0; flex: 1; outline: none; font-size: 14px; color: var(--ink); }
+.search input::placeholder { color: var(--faint); }
+.search:focus-within { box-shadow: 0 0 0 2px var(--accent); }
+.online { display: flex; align-items: center; }
+.ppl { display: inline-flex; align-items: center; }
+.ppl img { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--bg); margin-left: -6px; background: var(--hover); }
+.ppl img:first-child { margin-left: 0; }
+.iconbtn { display: inline-grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: 8px; background: none; color: var(--muted); padding: 0; }
+.iconbtn:hover { background: var(--hover); color: var(--ink); }
+.me img { width: 28px; height: 28px; border-radius: 50%; display: block; }
 
-/* Top bar */
-.top { display: flex; align-items: center; justify-content: space-between; gap: 12px 16px; flex-wrap: wrap; margin-bottom: 14px; }
-.brand { font: 800 26px/1.1 var(--f-display); letter-spacing: -.02em; margin: 0; }
-.brand small { display: block; font: 500 11.5px/1.4 var(--f-mono); color: var(--muted); letter-spacing: .04em; text-transform: uppercase; margin-top: 4px; }
-.topr { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-width: 0; }
-.search { display: flex; align-items: center; gap: 8px; padding: 0 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--muted); width: min(300px, 100%); }
-.search input { border: 0; background: none; padding: 8px 0; min-width: 0; flex: 1; color: var(--ink); outline: none; }
-.search:focus-within { border-color: var(--accent); }
-.online { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); }
-.online .ppl img { width: 26px; height: 26px; }
-.live { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 25%, transparent); }
-.me { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
-.me img { width: 28px; height: 28px; border-radius: 50%; }
+.grid { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; align-items: start; }
 
-/* Quick add */
-.quick { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; margin-bottom: 16px; padding: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
-.quick input { border: 0; background: none; padding: 6px 8px; min-width: 0; outline: none; font-size: 15px; }
-.qprev { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; padding: 0 8px 2px; font-size: 12.5px; }
-.qprev:empty { display: none; }
-.pill { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 99px; background: var(--surface-2); border: 1px solid var(--line); color: var(--muted); font-size: 12.5px; }
-.pill b { color: var(--ink); font-weight: 600; }
-.pill i { width: 8px; height: 8px; border-radius: 2px; background: var(--c); }
+/* Sidebar */
+.side { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); display: grid; gap: 2px; }
+.tab { display: flex; align-items: center; gap: 10px; width: 100%; padding: 6px 10px; border: 0; border-radius: 7px; background: none; text-align: left; color: var(--muted); font-size: 14px; }
+.tab:hover { background: var(--hover); color: var(--ink); }
+.tab[aria-current="true"] { background: var(--hover); color: var(--ink); font-weight: 600; }
+.tab .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c, var(--faint)); flex: none; }
+.tab .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tab .n { font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; font-weight: 500; }
+.tab.arch { opacity: .6; }
+.side hr { border: 0; border-top: 1px solid var(--line); margin: 8px 10px; }
+.linkbtn { border: 0; background: none; padding: 6px 10px; color: var(--faint); font-size: 13.5px; text-align: left; border-radius: 7px; }
+.linkbtn:hover { color: var(--ink); background: var(--hover); }
+.addsub { display: grid; gap: 6px; padding: 6px 4px; }
+.field { width: 100%; padding: 7px 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); min-width: 0; font-size: 14px; }
+.field::placeholder { color: var(--faint); }
+.field:focus { outline: none; border-color: var(--accent); }
 
-.grid { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 20px; align-items: start; }
-
-/* Subject tabs */
-.side { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); display: grid; gap: 12px; }
-.label { font: 500 11px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-.tabs { display: grid; gap: 2px; }
-.tab { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; align-items: center; gap: 4px 10px; width: 100%; text-align: left; padding: 8px 10px; border: 0; border-radius: 8px; background: transparent; }
-.tab:hover { background: var(--surface-2); }
-.tab[aria-current="true"] { background: var(--surface); box-shadow: 0 0 0 1px var(--line); }
-.tab.arch { opacity: .65; }
-.tab .dot { width: 10px; height: 10px; border-radius: 3px; background: var(--c, var(--ink)); }
-.tab .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
-.tab .code { font: 500 11px var(--f-mono); color: var(--muted); margin-left: 6px; }
-.tab .n { font: 500 12px var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
-.tab .bar { grid-column: 2 / -1; height: 4px; border-radius: 4px; background: var(--line); overflow: hidden; }
-.tab .bar span { display: block; height: 100%; background: var(--c, var(--accent)); border-radius: 4px; }
-.tab .icon-dot { display: grid; place-items: center; width: 10px; color: var(--accent); }
-.linkbtn { border: 0; background: none; padding: 4px 10px; color: var(--muted); font-size: 13px; text-align: left; }
-.linkbtn:hover { color: var(--ink); }
-.addsub { display: grid; gap: 8px; padding: 12px; border: 1px dashed var(--line); border-radius: var(--r); }
-.addsub-toggle { display: none; }
-.addsub .row { display: grid; grid-template-columns: minmax(0, 1fr) 84px; gap: 6px; }
-.field { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); min-width: 0; }
-.field::placeholder { color: var(--muted); opacity: .8; }
-
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); font-weight: 600; font-size: 14px; white-space: nowrap; }
-.btn:hover { border-color: var(--muted); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); font-weight: 600; font-size: 14px; white-space: nowrap; }
+.btn:hover { background: var(--hover); }
 .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-.btn.primary:hover { filter: brightness(1.08); }
+.btn.primary:hover { filter: brightness(1.07); background: var(--accent); }
+.btn.text { border-color: transparent; background: none; color: var(--muted); padding-inline: 8px; }
+.btn.text:hover { background: var(--hover); color: var(--ink); }
 .btn.danger { color: var(--late); }
 .btn.danger.solid { background: var(--late); color: var(--surface); border-color: var(--late); }
-.btn.ghost { border-color: transparent; background: transparent; color: var(--muted); }
-.btn.ghost:hover { color: var(--ink); background: var(--surface-2); }
-.btn.sm { padding: 5px 10px; font-size: 13px; }
 .btn:disabled { opacity: .5; cursor: default; }
 
 /* Main */
-.main { min-width: 0; display: grid; gap: 14px; }
-.hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px 20px; align-items: center; padding: 16px 20px; border-radius: 14px; background: var(--ink); color: var(--bg); }
-.hero .label { color: color-mix(in srgb, var(--bg) 70%, var(--ink)); }
-.hero h3 { margin: 6px 0 4px; font: 600 19px/1.25 var(--f-display); text-wrap: balance; overflow-wrap: anywhere; }
-.hero h3 button { all: unset; cursor: pointer; }
-.hero h3 button:hover { text-decoration: underline; }
-.hero .sub { font: 500 12.5px var(--f-mono); color: color-mix(in srgb, var(--bg) 70%, var(--ink)); display: flex; flex-wrap: wrap; gap: 4px 12px; }
-.count { display: flex; gap: 14px; font-variant-numeric: tabular-nums; }
-.count div { display: grid; justify-items: center; }
-.count b { font: 800 clamp(30px, 5vw, 42px)/1 var(--f-display); letter-spacing: -.02em; }
-.count small { font: 500 10.5px var(--f-mono); text-transform: uppercase; letter-spacing: .08em; color: color-mix(in srgb, var(--bg) 70%, var(--ink)); }
-.hero.late { background: var(--late); }
+.main { min-width: 0; display: grid; gap: 18px; }
+.mhead { display: grid; gap: 6px; }
+.title-row { display: flex; align-items: center; gap: 8px; }
+.title-row h2 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -.02em; line-height: 1.15; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.summary { color: var(--muted); font-size: 14px; display: flex; flex-wrap: wrap; gap: 4px 0; }
+.summary > span:not(:last-child)::after { content: "·"; margin: 0 8px; color: var(--faint); }
+.summary .late { color: var(--late); }
+.summary button { border: 0; background: none; padding: 0; color: var(--ink); font-weight: 500; }
+.summary button:hover { text-decoration: underline; }
+.summary b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
 
-.head { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; display: grid; gap: 14px; border-top: 5px solid var(--c, var(--accent)); }
-.head h2 { margin: 0; font: 800 clamp(24px, 4vw, 34px)/1.05 var(--f-display); letter-spacing: -.02em; text-wrap: balance; overflow-wrap: anywhere; }
-.head .code { font: 500 13px var(--f-mono); color: var(--muted); }
-.head-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
-.stats { display: flex; flex-wrap: wrap; gap: 8px 22px; }
-.stat { display: grid; gap: 2px; }
-.stat b { font: 600 22px/1 var(--f-display); font-variant-numeric: tabular-nums; }
-.stat.late b { color: var(--late); }
-.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.toolbar .sp { flex: 1; }
-.seg { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px; }
-.seg button { border: 0; background: transparent; padding: 5px 11px; border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--muted); display: inline-flex; align-items: center; gap: 5px; }
-.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px var(--shadow), 0 0 0 1px var(--line); }
-.tools-l { display: flex; flex-wrap: wrap; gap: 8px; }
+.menu-wrap { position: relative; }
+.menu { position: absolute; right: 0; top: calc(100% + 4px); min-width: 190px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 4px; box-shadow: 0 10px 30px var(--shadow); z-index: 10; display: grid; }
+.menu button { display: flex; align-items: center; gap: 10px; border: 0; background: none; padding: 8px 10px; border-radius: 6px; text-align: left; font-size: 14px; }
+.menu button:hover { background: var(--hover); }
 
-/* Cards */
-.list { display: grid; gap: 8px; }
-.card { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
-.card.done { background: var(--surface-2); }
-.card.done .ttl { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
-.card[draggable="true"] { cursor: grab; }
-.card.dragging { opacity: .4; }
-.status { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--muted); background: transparent; display: grid; place-items: center; padding: 0; margin-top: 1px; flex: none; }
-.status[data-s="doing"] { border-color: var(--accent); background: conic-gradient(var(--accent) 0 50%, transparent 50% 100%); }
-.status[data-s="done"] { border-color: var(--ok); background: var(--ok); }
-.status[data-s="done"]::after { content: ""; width: 10px; height: 5px; border: 2px solid var(--surface); border-top: 0; border-right: 0; transform: translateY(-1px) rotate(-45deg); }
-.status:disabled { cursor: default; }
-.body { min-width: 0; display: grid; gap: 6px; }
-.line1 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
-.ttl { font-weight: 600; font-size: 16px; border: 0; background: none; padding: 0; text-align: left; min-width: 0; overflow-wrap: anywhere; }
-.ttl:hover { color: var(--accent); }
-.kind { font: 500 10.5px/1 var(--f-mono); letter-spacing: .07em; text-transform: uppercase; padding: 4px 6px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); }
-.kind.assignment { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
-.here { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--ok); }
-.here img { width: 16px; height: 16px; border-radius: 50%; }
-.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: 13px; color: var(--muted); }
-.meta > span { display: inline-flex; align-items: center; gap: 4px; }
-.due { font: 500 12.5px var(--f-mono); font-variant-numeric: tabular-nums; }
-.due.soon { color: var(--ink); background: linear-gradient(transparent 45%, var(--hl) 45%, var(--hl) 92%, transparent 92%); padding-inline: 2px; }
-.due.late { color: var(--late); }
-.subj i { width: 8px; height: 8px; border-radius: 2px; background: var(--c); }
-.ppl { display: inline-flex; align-items: center; }
-.ppl img { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--surface); margin-left: -6px; background: var(--surface-2); }
-.ppl img:first-child { margin-left: 0; }
-.prog { height: 5px; border-radius: 5px; background: var(--line); overflow: hidden; }
-.prog span { display: block; height: 100%; background: var(--ok); border-radius: 5px; }
-.note { color: var(--muted); font-size: 14px; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.more { justify-self: start; border: 0; background: none; padding: 0; font-size: 13px; color: var(--accent); font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
-.cl { display: grid; gap: 2px; padding: 6px 0 0; }
-.cl label { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 8px; align-items: start; font-size: 14px; padding: 3px 0; }
-.cl input { width: 16px; height: 16px; margin: 2px 0 0; accent-color: var(--ok); }
-.cl .done-t { color: var(--muted); text-decoration: line-through; }
-.cl .who { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
-.cl .who img { width: 18px; height: 18px; border-radius: 50%; }
+.quick { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 4px 4px 4px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.quick:focus-within { border-color: var(--accent); }
+.quick > svg { color: var(--faint); }
+.quick input { border: 0; background: none; padding: 8px 0; min-width: 0; outline: none; }
+.quick input::placeholder { color: var(--faint); }
+.qprev { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 6px; font-size: 12.5px; color: var(--muted); }
+.qprev:empty { display: none; }
+.qprev span { display: inline-flex; align-items: center; gap: 5px; }
+.qprev span:not(:last-child)::after { content: "·"; margin-left: 6px; color: var(--faint); }
+.qprev i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; border-bottom: 1px solid var(--line); }
+.tabs-u { display: flex; gap: 16px; overflow-x: auto; }
+.tabs-u button { border: 0; background: none; padding: 6px 0 9px; color: var(--muted); font-size: 14px; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+.tabs-u button:hover { color: var(--ink); }
+.tabs-u button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
+.bar .sp { flex: 1; }
+.filter { border: 0; background: none; color: var(--muted); font-size: 13.5px; padding: 6px 0 9px; }
+.filter:hover { color: var(--ink); }
+select.filter { padding-right: 4px; }
+
+/* Rows */
+.rows { display: grid; }
+.row { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 11px 8px; border-bottom: 1px solid var(--line); border-radius: 0; }
+.row:hover { background: var(--hover); }
+.check { width: 20px; height: 20px; border-radius: 50%; border: 1.6px solid var(--faint); background: none; padding: 0; margin-top: 1px; display: grid; place-items: center; }
+.check:hover:not(:disabled) { border-color: var(--ok); }
+.check[data-s="doing"] { border-color: var(--accent); background: conic-gradient(var(--accent) 0 50%, transparent 50% 100%); }
+.check[data-s="done"] { border-color: var(--ok); background: var(--ok); }
+.check[data-s="done"]::after { content: ""; width: 8px; height: 4px; border: 2px solid var(--surface); border-top: 0; border-right: 0; transform: translateY(-1px) rotate(-45deg); }
+.check:disabled { cursor: default; }
+.row .main-c { min-width: 0; display: grid; gap: 2px; }
+.row .t { border: 0; background: none; padding: 0; text-align: left; font-size: 15px; font-weight: 500; overflow-wrap: anywhere; }
+.row.done .t { color: var(--faint); text-decoration: line-through; }
+.row .m { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 0; font-size: 12.5px; color: var(--muted); }
+.row .m > span { display: inline-flex; align-items: center; gap: 5px; }
+.row .m > span:not(:last-child)::after { content: "·"; margin: 0 7px; color: var(--faint); }
+.row .m i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+.row .m .ppl img { width: 18px; height: 18px; border-color: var(--bg); }
+.row:hover .m .ppl img { border-color: var(--hover); }
+.row .r { font-size: 13px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; padding-top: 1px; display: flex; align-items: center; gap: 8px; }
+.row .r.late { color: var(--late); }
+.row .r.soon { color: var(--ink); font-weight: 600; }
+.here img { width: 16px; height: 16px; border-radius: 50%; box-shadow: 0 0 0 2px var(--ok); }
+.row[draggable="true"] { cursor: grab; }
+.row.dragging { opacity: .4; }
 
 /* Board */
-.board { display: grid; grid-template-columns: repeat(3, minmax(250px, 1fr)); gap: 12px; overflow-x: auto; padding-bottom: 4px; }
-.col { background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 10px; display: grid; gap: 8px; align-content: start; min-height: 160px; }
-.col.over { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface-2)); }
-.col h4 { margin: 0; display: flex; justify-content: space-between; font: 600 14px var(--f-display); padding: 2px 4px; }
-.col h4 span { font: 500 12px var(--f-mono); color: var(--muted); }
-.col .card { padding: 12px; gap: 10px; }
-.col .ttl { font-size: 15px; }
+.board { display: grid; grid-template-columns: repeat(3, minmax(230px, 1fr)); gap: 20px; overflow-x: auto; }
+.col { display: grid; align-content: start; min-height: 140px; border-radius: 10px; }
+.col.over { background: var(--hover); }
+.col h4 { margin: 0 0 4px; font-size: 13px; font-weight: 600; color: var(--muted); display: flex; gap: 8px; padding: 0 8px; }
+.col h4 span { color: var(--faint); font-weight: 500; }
+.col .row { grid-template-columns: 22px minmax(0, 1fr); }
+.col .row .r { grid-column: 2; padding: 0; }
 
 /* Calendar */
-.cal { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; }
-.cal-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.cal-h h3 { margin: 0; font: 600 18px var(--f-display); }
-.cal-g { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
-.cal-g .dow { font: 500 11px var(--f-mono); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; padding: 2px 4px; }
-.day { min-height: 92px; border: 1px solid var(--line); border-radius: 8px; padding: 4px; display: grid; align-content: start; gap: 3px; background: var(--surface); text-align: left; min-width: 0; }
-.day.out { background: var(--surface-2); opacity: .6; }
-.day.today { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
-.day.sel { background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
-.day .num { font: 500 12px var(--f-mono); color: var(--muted); border: 0; background: none; padding: 1px 3px; text-align: left; border-radius: 4px; }
-.day.today .num { color: var(--accent); font-weight: 700; }
-.ev { display: block; width: 100%; border: 0; border-left: 3px solid var(--c); background: var(--surface-2); border-radius: 3px; padding: 2px 5px; font-size: 12px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ev.done { text-decoration: line-through; color: var(--muted); }
-.ev:hover { background: var(--line); }
-.ev-more { font-size: 11.5px; color: var(--muted); padding-left: 4px; }
+.cal-h { display: flex; align-items: center; gap: 4px; }
+.cal-h h3 { margin: 0 8px 0 0; font-size: 16px; font-weight: 600; }
+.cal-g { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.cal-g .dow { font-size: 12px; color: var(--faint); padding: 6px 8px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.day { min-height: 92px; padding: 4px; display: grid; align-content: start; gap: 2px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); min-width: 0; }
+.day.out .num { color: var(--faint); opacity: .6; }
+.day.sel { background: var(--hover); }
+.day .num { font-size: 12px; color: var(--muted); border: 0; background: none; padding: 2px 4px; justify-self: start; border-radius: 5px; font-variant-numeric: tabular-nums; }
+.day.today .num { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.ev { display: flex; align-items: center; gap: 5px; width: 100%; border: 0; background: none; border-radius: 4px; padding: 1px 4px; font-size: 12px; text-align: left; min-width: 0; }
+.ev i { width: 6px; height: 6px; border-radius: 50%; background: var(--c); flex: none; }
+.ev span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ev.done span { text-decoration: line-through; color: var(--faint); }
+.ev:hover { background: var(--hover); }
+.ev-more { font-size: 11.5px; color: var(--faint); border: 0; background: none; text-align: left; padding: 0 4px; }
 
-.empty { text-align: center; padding: 40px 20px; border: 1px dashed var(--line); border-radius: 14px; color: var(--muted); display: grid; gap: 10px; justify-items: center; }
-.empty h3 { margin: 0; color: var(--ink); font: 600 20px var(--f-display); }
-.empty p { margin: 0; max-width: 50ch; }
-.notice { padding: 12px 14px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); font-size: 14px; color: var(--muted); }
+.empty { padding: 48px 12px; text-align: center; color: var(--muted); display: grid; gap: 8px; justify-items: center; }
+.empty h3 { margin: 0; color: var(--ink); font-size: 17px; font-weight: 600; }
+.empty p { margin: 0; max-width: 44ch; font-size: 14px; }
+.hint { font-size: 13px; color: var(--faint); }
 
 /* Drawer + modal */
 .overlay { position: fixed; inset: 0; background: var(--scrim); z-index: 20; display: flex; justify-content: flex-end; }
 .overlay.center { justify-content: center; align-items: center; padding: 16px; overflow-y: auto; }
-.drawer { width: min(640px, 100%); height: 100%; background: var(--surface); border-left: 1px solid var(--line); display: grid; grid-template-rows: auto minmax(0, 1fr) auto; box-shadow: -10px 0 40px var(--shadow); }
-.drawer-h { padding: calc(env(safe-area-inset-top, 0px) + 14px) 20px 12px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; justify-content: space-between; }
-.drawer-h h3 { margin: 0; font: 800 20px var(--f-display); }
-.drawer-b { overflow-y: auto; padding: 18px 20px; display: grid; gap: 16px; align-content: start; }
-.drawer-f { padding: 12px 20px calc(env(safe-area-inset-bottom, 0px) + 12px); border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; }
-.drawer-f .r { display: flex; gap: 8px; margin-left: auto; }
-.modal { width: min(520px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: grid; gap: 14px; box-shadow: 0 20px 60px var(--shadow); }
-.modal h3 { margin: 0; font: 800 22px var(--f-display); }
-.modal p { margin: 0; color: var(--muted); font-size: 14px; }
-.f { display: grid; gap: 5px; }
-.f > span, .sec-h { font-size: 13px; font-weight: 600; color: var(--muted); }
-.sec-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.frow { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-textarea.field { min-height: 150px; resize: vertical; line-height: 1.5; }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 4px 3px 3px; border-radius: 99px; background: var(--surface-2); border: 1px solid var(--line); font-size: 13px; }
+.drawer { width: min(600px, 100%); height: 100%; background: var(--surface); display: grid; grid-template-rows: auto minmax(0, 1fr) auto; box-shadow: -12px 0 40px var(--shadow); }
+.drawer-h { padding: calc(env(safe-area-inset-top, 0px) + 10px) 16px 0; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.drawer-b { overflow-y: auto; padding: 4px 28px 24px; display: grid; gap: 22px; align-content: start; }
+.drawer-f { padding: 12px 28px calc(env(safe-area-inset-bottom, 0px) + 12px); border-top: 1px solid var(--line); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.drawer-f .sp { flex: 1; }
+.t-in { border: 0; background: none; font-size: 24px; font-weight: 700; letter-spacing: -.01em; padding: 0; width: 100%; outline: none; }
+.t-in::placeholder { color: var(--faint); }
+.props { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 2px 12px; align-items: center; font-size: 14px; }
+.props > .k { color: var(--muted); padding: 6px 0; }
+.props > .v { min-width: 0; }
+.ghost-in { border: 1px solid transparent; background: none; border-radius: 6px; padding: 5px 8px; margin-left: -8px; max-width: 100%; }
+.ghost-in:hover:not(:disabled) { background: var(--hover); }
+.ghost-in:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+.ghost-in:disabled { opacity: 1; }
+.seg { display: inline-flex; gap: 2px; margin-left: -8px; }
+.seg button { border: 0; background: none; padding: 4px 8px; border-radius: 6px; color: var(--muted); font-size: 14px; }
+.seg button:hover:not(:disabled) { background: var(--hover); }
+.seg button[aria-pressed="true"] { background: var(--hover); color: var(--ink); font-weight: 600; }
+.sec { display: grid; gap: 8px; }
+.sec-h { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.sec-h .sp { flex: 1; }
+.sec-h .lnk { border: 0; background: none; padding: 2px 6px; border-radius: 5px; color: var(--muted); font-size: 13px; font-weight: 500; display: inline-flex; gap: 5px; align-items: center; }
+.sec-h .lnk:hover { color: var(--ink); background: var(--hover); }
+.sec-h .lnk[aria-pressed="true"] { color: var(--ink); }
+.people { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 4px 2px 2px; border-radius: 99px; background: var(--hover); font-size: 13px; }
 .chip img { width: 20px; height: 20px; border-radius: 50%; }
-.chip button { border: 0; background: none; padding: 0 6px; color: var(--muted); font-size: 15px; line-height: 1; }
-.picker { position: relative; flex: 1; min-width: 0; }
-.results { position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 4px; z-index: 2; box-shadow: 0 8px 24px var(--shadow); display: grid; }
-.results button { display: flex; align-items: center; gap: 8px; border: 0; background: none; padding: 7px 8px; border-radius: 6px; text-align: left; }
-.results button:hover, .results button:focus-visible { background: var(--surface-2); }
-.results img { width: 22px; height: 22px; border-radius: 50%; }
-.by { font-size: 12.5px; color: var(--muted); }
-.alsohere { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; background: color-mix(in srgb, var(--ok) 12%, var(--surface)); font-size: 13px; }
-.alsohere img { width: 20px; height: 20px; border-radius: 50%; }
+.chip button { border: 0; background: none; padding: 0 5px; color: var(--muted); font-size: 15px; line-height: 1; }
+.picker { position: relative; min-width: 140px; flex: 1; }
+.picker input { width: 100%; }
+.results { position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 4px; z-index: 2; box-shadow: 0 10px 30px var(--shadow); display: grid; }
+.results button { display: flex; align-items: center; gap: 8px; border: 0; background: none; padding: 7px 8px; border-radius: 6px; text-align: left; font-size: 14px; }
+.results button:hover { background: var(--hover); }
+.results img { width: 20px; height: 20px; border-radius: 50%; }
 
-.cl-ed { display: grid; gap: 6px; }
-.cl-row { display: grid; grid-template-columns: 18px minmax(0, 1fr) 120px 128px 28px; gap: 6px; align-items: center; }
+.cl-row { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto auto 26px; gap: 8px; align-items: center; }
 .cl-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--ok); margin: 0; }
-.cl-row .field { padding: 6px 8px; font-size: 14px; }
-.x { border: 0; background: none; color: var(--muted); font-size: 18px; line-height: 1; padding: 4px; border-radius: 6px; }
-.x:hover { color: var(--late); background: var(--surface-2); }
+.cl-row .txt { border: 0; background: none; padding: 4px 0; min-width: 0; outline: none; font-size: 14px; }
+.cl-row .txt.done { color: var(--faint); text-decoration: line-through; }
+.cl-row select, .cl-row input[type="date"] { border: 0; background: none; color: var(--muted); font-size: 12.5px; padding: 2px 4px; border-radius: 5px; max-width: 130px; }
+.cl-row select:hover, .cl-row input[type="date"]:hover { background: var(--hover); }
+.cl-add { border: 0; background: none; padding: 4px 0 4px 28px; outline: none; font-size: 14px; width: 100%; }
+.cl-add::placeholder { color: var(--faint); }
+.x { border: 0; background: none; color: var(--faint); font-size: 17px; line-height: 1; padding: 3px; border-radius: 5px; }
+.x:hover { color: var(--late); background: var(--hover); }
+.cl-row .x { visibility: hidden; }
+.cl-row:hover .x, .cl-row:focus-within .x { visibility: visible; }
 
-.files { display: grid; gap: 6px; }
-.file { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; }
-.file a { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
-.file small { font: 500 11.5px var(--f-mono); color: var(--muted); }
-.thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
-.thumbs a { display: block; aspect-ratio: 4 / 3; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); background: var(--surface-2); max-width: 100%; }
-.thumbs img { width: 100%; height: 100%; object-fit: cover; }
-.drop { display: grid; place-items: center; gap: 4px; padding: 14px; border: 1px dashed var(--line); border-radius: 10px; color: var(--muted); font-size: 13px; text-align: center; cursor: pointer; }
-.drop.over { border-color: var(--accent); color: var(--accent); }
-
+.notes { width: 100%; min-height: 140px; border: 0; background: none; padding: 0; resize: vertical; outline: none; font-size: 14.5px; line-height: 1.6; }
+.notes::placeholder { color: var(--faint); }
 .md { font-size: 14.5px; line-height: 1.6; overflow-wrap: anywhere; min-width: 0; }
 .md > :first-child { margin-top: 0; } .md > :last-child { margin-bottom: 0; }
-.md h1, .md h2, .md h3 { font-family: var(--f-display); line-height: 1.2; margin: 1em 0 .4em; }
-.md h1 { font-size: 21px; } .md h2 { font-size: 18px; } .md h3 { font-size: 16px; }
-.md p, .md ul, .md ol, .md blockquote { margin: .5em 0; }
+.md h1, .md h2, .md h3 { line-height: 1.25; margin: 1em 0 .35em; }
+.md h1 { font-size: 20px; } .md h2 { font-size: 17px; } .md h3 { font-size: 15px; }
+.md p, .md ul, .md ol, .md blockquote { margin: .45em 0; }
 .md ul, .md ol { padding-left: 1.3em; }
-.md code { font: 500 .88em var(--f-mono); background: var(--surface-2); padding: 1px 4px; border-radius: 4px; }
-.md blockquote { border-left: 3px solid var(--line); padding-left: 12px; color: var(--muted); }
-.md-box { border: 1px solid var(--line); border-radius: 8px; padding: 12px; min-height: 150px; background: var(--surface); }
-.ai-box { border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line)); background: color-mix(in srgb, var(--accent) 6%, var(--surface)); border-radius: 10px; padding: 12px; display: grid; gap: 10px; }
+.md code { font-size: .9em; background: var(--hover); padding: 1px 4px; border-radius: 4px; }
+.md blockquote { border-left: 2px solid var(--line); padding-left: 12px; color: var(--muted); }
+.ai-box { background: var(--hover); border-radius: 10px; padding: 12px 14px; display: grid; gap: 8px; }
 
-.comments { display: grid; gap: 10px; }
-.cm { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; }
-.cm img { width: 28px; height: 28px; border-radius: 50%; }
-.cm .t { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; }
+.files { display: grid; gap: 2px; }
+.file { display: flex; align-items: center; gap: 10px; padding: 6px 8px; margin-inline: -8px; border-radius: 7px; font-size: 14px; }
+.file:hover { background: var(--hover); }
+.file a { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+.file small { color: var(--faint); font-size: 12px; }
+.file .x { visibility: hidden; }
+.file:hover .x { visibility: visible; }
+.thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 6px; }
+.thumbs a { display: block; aspect-ratio: 4 / 3; border-radius: 8px; overflow: hidden; background: var(--hover); max-width: 100%; }
+.thumbs img { width: 100%; height: 100%; object-fit: cover; }
+.drop-over { outline: 2px dashed var(--accent); outline-offset: 6px; border-radius: 6px; }
+
+.comments { display: grid; gap: 12px; }
+.cm { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 10px; }
+.cm img { width: 24px; height: 24px; border-radius: 50%; }
+.cm .tx { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; }
 .cm .h { display: flex; gap: 8px; align-items: baseline; font-size: 13px; }
 .cm .h b { font-weight: 600; }
-.cm .h small { color: var(--muted); font-size: 12px; }
-.cm .h button { margin-left: auto; border: 0; background: none; color: var(--muted); font-size: 12px; padding: 0; }
+.cm .h small { color: var(--faint); font-size: 12px; }
+.cm .h button { margin-left: auto; border: 0; background: none; color: var(--faint); font-size: 12px; padding: 0; }
 .cm .h button:hover { color: var(--late); }
 .cm-new { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: end; }
-.cm-new textarea { min-height: 42px; resize: vertical; }
+.cm-new textarea { min-height: 38px; resize: vertical; }
+.by { font-size: 12.5px; color: var(--faint); }
+.alsohere { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ok); }
 
+.modal { width: min(500px, 100%); background: var(--surface); border-radius: 14px; padding: 22px; display: grid; gap: 14px; box-shadow: 0 20px 60px var(--shadow); }
+.modal h3 { margin: 0; font-size: 19px; font-weight: 700; }
+.modal p { margin: 0; color: var(--muted); font-size: 14px; }
+.f { display: grid; gap: 5px; }
+.f > span { font-size: 13px; font-weight: 600; color: var(--muted); }
+.frow { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+textarea.field { min-height: 120px; resize: vertical; }
 .swatches { display: flex; flex-wrap: wrap; gap: 8px; }
-.swatches button { width: 32px; height: 32px; border-radius: 8px; border: 2px solid transparent; background: var(--c); padding: 0; }
-.swatches button[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 2px var(--surface); }
-.confirm { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 12px; border-radius: 8px; background: var(--surface-2); font-size: 14px; }
+.swatches button { width: 26px; height: 26px; border-radius: 50%; border: 0; background: var(--c); padding: 0; }
+.swatches button[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--c); }
+.confirm { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 12px; border-radius: 8px; background: var(--hover); font-size: 14px; }
 
-.toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: 14px; z-index: 40; max-width: calc(100% - 32px); }
+.toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 99px; font-size: 14px; z-index: 40; max-width: calc(100% - 32px); }
 
 @media (max-width: 760px) {
   .wrap { padding-inline: 16px; }
-  .grid { grid-template-columns: minmax(0, 1fr); }
-  .side { position: static; }
-  .tabs { display: flex; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
-  .tab { width: auto; flex: none; max-width: 220px; background: var(--surface); box-shadow: 0 0 0 1px var(--line); }
-  .tab[aria-current="true"] { box-shadow: 0 0 0 2px var(--c, var(--accent)); }
-  .tab .code { display: none; }
-  .addsub-toggle { display: block; }
-  .addsub:not(.open) { display: none; }
-  .hero { grid-template-columns: minmax(0, 1fr); }
-  .search { width: 100%; }
-  .topr { width: 100%; }
-  .day { min-height: 64px; padding: 2px; }
-  .ev { font-size: 0; height: 6px; padding: 0; border-left-width: 0; background: var(--c); }
+  .top { margin-bottom: 16px; flex-wrap: wrap; }
+  .search { order: 5; width: 100%; }
+  .grid { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .side { position: static; display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px; }
+  .side .tab { width: auto; flex: none; max-width: 200px; }
+  .side hr { display: none; }
+  .side .linkbtn { flex: none; white-space: nowrap; }
+  .addsub { flex: none; grid-auto-flow: column; }
+  .title-row h2 { font-size: 24px; }
+  .day { min-height: 56px; padding: 2px; }
+  .ev { padding: 0 2px; }
+  .ev span { display: none; }
   .ev-more { font-size: 10px; }
-  .cl-row { grid-template-columns: 18px minmax(0, 1fr) 28px; }
-  .cl-row .cl-who, .cl-row .cl-due { grid-column: 2 / 3; }
-  .cl-row .cl-x { grid-column: 3; grid-row: 1; }
-  .drawer-b, .drawer-h, .drawer-f { padding-inline: 16px; }
+  .props { grid-template-columns: 90px minmax(0, 1fr); }
+  .drawer-b { padding-inline: 18px; }
+  .drawer-f { padding-inline: 18px; }
+  .cl-row { grid-template-columns: 20px minmax(0, 1fr) 26px; }
+  .cl-row .cl-meta { grid-column: 2; display: flex; gap: 4px; }
+  .cl-row .x { grid-column: 3; grid-row: 1; visibility: visible; }
 }
 </style>
 
 <div class="wrap">
   <header class="top">
-    <h1 class="brand">Team Notebook<small>Assignments · tasks · notes, by subject</small></h1>
-    <div class="topr">
-      <label class="search" for="search">
-        <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="search" type="search" placeholder="Search notes and tasks" autocomplete="off">
-      </label>
-      <div class="online" id="online"></div>
-      <button class="btn ghost sm" id="theme" type="button"></button>
-      <div class="me" id="me"></div>
-    </div>
+    <h1 class="brand">Team Notebook</h1>
+    <span class="sp"></span>
+    <label class="search" for="search">
+      <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="search" type="search" placeholder="Search" autocomplete="off">
+    </label>
+    <div class="online" id="online"></div>
+    <button class="iconbtn" id="theme" type="button"></button>
+    <div class="me" id="me"></div>
   </header>
-  <form class="quick" id="quick" hidden>
-    <input id="quick-in" autocomplete="off" placeholder="Quick add: &quot;Quiz 2 MAT101 friday&quot; or &quot;Read chapter 4 tomorrow @me&quot;" aria-label="Quick add">
-    <button class="btn primary sm" type="submit">Add</button>
-    <div class="qprev" id="quick-prev"></div>
-  </form>
   <div class="grid">
-    <aside class="side" id="side"></aside>
-    <main class="main" id="main"></main>
+    <nav class="side" id="side" aria-label="Subjects"></nav>
+    <main class="main">
+      <div class="mhead" id="mhead"></div>
+      <form class="quick" id="quick" hidden>
+        <svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        <input id="quick-in" autocomplete="off" placeholder="Add a task, e.g. Quiz 2 MAT101 friday" aria-label="Add a task">
+        <button class="btn text" type="button" id="quick-more" title="Add with details">Details</button>
+        <div class="qprev" id="quick-prev"></div>
+      </form>
+      <div id="mbody" style="display:grid;gap:14px;min-width:0"></div>
+    </main>
   </div>
 </div>
 <div id="layer"></div>
@@ -377,6 +381,9 @@ textarea.field { min-height: 150px; resize: vertical; line-height: 1.5; }
     chat: '<path d="M4 5h16v11H9l-5 4z"/>',
     sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/>',
     moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+    dots: '<circle cx="5" cy="12" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="19" cy="12" r="1.3" fill="currentColor"/>',
+    cog: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+    close: '<path d="M6 6l12 12M18 6 6 18"/>',
     auto: '<circle cx="12" cy="12" r="8"/><path d="M12 4v16" /><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>',
   };
   const icon = n => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('class', 'i'); s.setAttribute('viewBox', '0 0 24 24'); s.innerHTML = ICONS[n]; return s; };
@@ -518,8 +525,8 @@ textarea.field { min-height: 150px; resize: vertical; line-height: 1.5; }
     if (!S.room) return;
     const ids = [...new Set(S.peers.filter(p => p.kind === 'viewer').map(peerUid).filter(Boolean))];
     if (!ids.length) return;
-    box.append(h('span', { class: 'live', title: 'Live' }), h('span', { class: 'ppl' }, ids.slice(0, 6).map(u => h('img', { 'data-uid': u, alt: '' }))),
-      h('span', { text: ids.length === 1 ? 'Only you online' : `${ids.length} online` }));
+    if (ids.length < 2) return;
+    box.append(h('span', { class: 'ppl', title: `${ids.length} people online now` }, ids.slice(0, 5).map(u => h('img', { 'data-uid': u, alt: '' }))));
     fillPeople(box);
   }
 
@@ -528,13 +535,15 @@ textarea.field { min-height: 150px; resize: vertical; line-height: 1.5; }
     const r = document.documentElement;
     if (S.theme === 'system') r.removeAttribute('data-theme'); else r.setAttribute('data-theme', S.theme);
     const b = $('theme');
-    b.replaceChildren(icon(S.theme === 'dark' ? 'moon' : S.theme === 'light' ? 'sun' : 'auto'), { system: 'Auto', light: 'Light', dark: 'Dark' }[S.theme]);
-    b.setAttribute('aria-label', `Theme: ${S.theme}. Change theme`);
+    b.replaceChildren(icon(S.theme === 'dark' ? 'moon' : S.theme === 'light' ? 'sun' : 'auto'));
+    b.setAttribute('aria-label', `Theme: ${{ system: 'automatic', light: 'light', dark: 'dark' }[S.theme]}. Change theme`);
+    b.title = `Theme: ${{ system: 'Auto', light: 'Light', dark: 'Dark' }[S.theme]}`;
   }
   $('theme').addEventListener('click', () => { S.theme = { system: 'light', light: 'dark', dark: 'system' }[S.theme] || 'system'; savePrefs(); applyTheme(); });
 
   // ---------- search ----------
   $('search').addEventListener('input', e => { S.q = e.target.value.trim(); renderMain(); });
+  $('search').addEventListener('keydown', e => { if (e.key === 'Escape') { e.target.value = ''; S.q = ''; renderMain(); } });
 
   // ---------- quick add ----------
   const DAYS = { sun: 0, sunday: 0, ahad: 0, mon: 1, monday: 1, isnin: 1, tue: 2, tues: 2, tuesday: 2, selasa: 2, wed: 3, wednesday: 3, rabu: 3, thu: 4, thur: 4, thurs: 4, thursday: 4, khamis: 4, fri: 5, friday: 5, jumaat: 5, sat: 6, saturday: 6, sabtu: 6 };
@@ -578,13 +587,19 @@ textarea.field { min-height: 150px; resize: vertical; line-height: 1.5; }
     const box = $('quick-prev'); box.replaceChildren();
     if (!qIn.value.trim()) return;
     const p = parseQuick(qIn.value); const s = subjById(p.subjectId);
-    box.append(h('span', { class: 'pill' }, h('b', { text: KINDS[p.kind] })));
-    if (s) box.append(h('span', { class: 'pill', style: `--c:${subjColor(s)}` }, h('i'), h('b', { text: s.code || s.name })));
-    box.append(h('span', { class: 'pill' }, p.due ? h('b', { text: fmtDate(p.due) }) : 'No due date'));
-    if (p.me) box.append(h('span', { class: 'pill' }, h('b', { text: 'Assigned to you' })));
-    box.append(h('span', { class: 'pill' }, 'Press Enter to add'));
+    if (s) box.append(h('span', { style: `--c:${subjColor(s)}` }, h('i'), s.code || s.name));
+    box.append(h('span', { text: KINDS[p.kind] }));
+    box.append(h('span', { text: p.due ? fmtDate(p.due) : 'No due date' }));
+    if (p.me) box.append(h('span', { text: 'You' }));
+    box.append(h('span', { text: 'Enter to add' }));
   }
   qIn.addEventListener('input', drawQuickPreview);
+  qIn.addEventListener('keydown', e => { if (e.key === 'Escape') { qIn.value = ''; drawQuickPreview(); } });
+  $('quick-more').addEventListener('click', () => {
+    const p = qIn.value.trim() ? parseQuick(qIn.value) : null;
+    openItem(null, p ? { kind: p.kind, title: p.title, subjectId: p.subjectId, due: p.due, assignees: p.me && S.meId ? [S.meId] : [] } : null);
+    qIn.value = ''; drawQuickPreview();
+  });
   $('quick').addEventListener('submit', async e => {
     e.preventDefault();
     if (!canEdit() || !qIn.value.trim()) return;
@@ -605,206 +620,186 @@ textarea.field { min-height: 150px; resize: vertical; line-height: 1.5; }
     const side = $('side');
     const keep = { name: $('new-subj-name') ? $('new-subj-name').value : '', code: $('new-subj-code') ? $('new-subj-code').value : '', focus: document.activeElement && document.activeElement.id };
     side.replaceChildren();
-    $('quick').hidden = !(canEdit() && activeSubjects().length && S.subjReady);
+    $('quick').hidden = !(canEdit() && activeSubjects().length && S.subjReady && !S.q);
     const open = S.items.filter(i => i.status !== 'done');
-    const tab = (id, name, code, color, opts = {}) => {
-      const all = S.items.filter(i => i.subjectId === id);
-      const pct = all.length ? Math.round(all.filter(i => i.status === 'done').length / all.length * 100) : 0;
-      return h('button', {
-        class: 'tab' + (opts.arch ? ' arch' : ''), 'aria-current': String(S.sel === id), style: color ? `--c:${color}` : null,
-        title: opts.bar ? `${pct}% done` : null,
-        onclick: () => { S.sel = id; S.calDay = null; savePrefs(); render(); }
-      }, opts.iconName ? h('span', { class: 'icon-dot' }, icon(opts.iconName)) : h('span', { class: 'dot' }),
-        h('span', { class: 'nm' }, name, code ? h('span', { class: 'code', text: code }) : null),
-        h('span', { class: 'n', text: S.itemsReady ? opts.count : '' }),
-        opts.bar && all.length ? h('span', { class: 'bar', 'aria-hidden': 'true' }, h('span', { style: `width:${pct}%` })) : null);
-    };
-    const tabs = h('nav', { class: 'tabs', 'aria-label': 'Subjects' });
-    if (S.meId) tabs.append(tab('mine', 'My tasks', '', 'var(--accent)', { iconName: 'user', count: open.filter(i => isMine(i) && !isArchivedSubj(i.subjectId)).length }));
-    tabs.append(tab('all', 'All subjects', '', 'var(--ink)', { count: open.filter(i => !isArchivedSubj(i.subjectId)).length }));
-    for (const s of activeSubjects()) tabs.append(tab(s.id, s.name, s.code, subjColor(s), { bar: true, count: open.filter(i => i.subjectId === s.id).length }));
+    const tab = (id, name, color, count, arch) => h('button', {
+      class: 'tab' + (arch ? ' arch' : ''), 'aria-current': String(S.sel === id), style: color ? `--c:${color}` : null,
+      onclick: () => { S.sel = id; S.calDay = null; savePrefs(); render(); }
+    }, color ? h('span', { class: 'dot' }) : null, h('span', { class: 'nm', text: name }), h('span', { class: 'n', text: S.itemsReady && count ? count : '' }));
+
+    if (S.meId) side.append(tab('mine', 'My tasks', null, open.filter(i => isMine(i) && !isArchivedSubj(i.subjectId)).length));
+    side.append(tab('all', 'All subjects', null, open.filter(i => !isArchivedSubj(i.subjectId)).length));
+    if (S.subjects.length) side.append(h('hr'));
+    for (const s of activeSubjects()) side.append(tab(s.id, s.name, subjColor(s), open.filter(i => i.subjectId === s.id).length));
     const archived = S.subjects.filter(s => s.archived);
-    if (S.showArchived) for (const s of archived) tabs.append(tab(s.id, s.name, s.code, subjColor(s), { bar: true, arch: true, count: open.filter(i => i.subjectId === s.id).length }));
-    side.append(h('div', { class: 'label', text: 'Subjects' }), tabs);
-    if (archived.length) side.append(h('button', { class: 'linkbtn', onclick: () => { S.showArchived = !S.showArchived; render(); }, text: S.showArchived ? 'Hide archived' : `Show archived (${archived.length})` }));
+    if (S.showArchived) for (const s of archived) side.append(tab(s.id, s.name, subjColor(s), 0, true));
+    if (archived.length) side.append(h('button', { class: 'linkbtn', onclick: () => { S.showArchived = !S.showArchived; render(); }, text: S.showArchived ? 'Hide archived' : `Archived (${archived.length})` }));
 
     if (canEdit()) {
-      const name = h('input', { class: 'field', id: 'new-subj-name', placeholder: 'Subject name', maxlength: '60', 'aria-label': 'Subject name' });
-      const code = h('input', { class: 'field', id: 'new-subj-code', placeholder: 'Code', maxlength: '12', 'aria-label': 'Subject code' });
-      name.value = keep.name; code.value = keep.code;
-      side.append(h('button', { class: 'linkbtn addsub-toggle', 'aria-expanded': String(!!S.addOpen), onclick: () => { S.addOpen = !S.addOpen; renderSide(); if (S.addOpen) $('new-subj-name').focus(); }, text: S.addOpen ? 'Close' : '+ Add a subject' }));
-      side.append(h('form', { class: 'addsub' + (S.addOpen ? ' open' : ''), onsubmit: async ev => {
-        ev.preventDefault();
-        const n = name.value.trim(); if (!n) { name.focus(); return; }
-        const used = new Set(activeSubjects().map(s => s.color));
-        let color = 0; while (used.has(color) && color < 7) color++;
-        if (used.has(color)) color = S.subjects.length % 8;
-        try {
-          const ref = await S.db.collection('subjects').add({ name: n, code: code.value.trim().toUpperCase(), color, archived: false, createdBy: S.meId, createdAt: new Date().toISOString() });
-          name.value = ''; code.value = ''; S.sel = ref.id; savePrefs(); toast(`Added ${n}`); render();
-        } catch (e) { writeErr(e); }
-      } }, h('div', { class: 'label', text: 'Add a subject' }), h('div', { class: 'row' }, name, code), h('button', { class: 'btn', type: 'submit', text: 'Add subject' })));
-      if (keep.focus === 'new-subj-name') name.focus(); else if (keep.focus === 'new-subj-code') code.focus();
+      if (!S.addOpen) {
+        side.append(h('button', { class: 'linkbtn', onclick: () => { S.addOpen = true; renderSide(); $('new-subj-name').focus(); }, text: '+ Add subject' }));
+      } else {
+        const name = h('input', { class: 'field', id: 'new-subj-name', placeholder: 'Subject name', maxlength: '60', 'aria-label': 'Subject name' });
+        const code = h('input', { class: 'field', id: 'new-subj-code', placeholder: 'Code (optional)', maxlength: '12', 'aria-label': 'Subject code' });
+        name.value = keep.name; code.value = keep.code;
+        const cancel = () => { S.addOpen = false; renderSide(); };
+        for (const el of [name, code]) el.addEventListener('keydown', e => { if (e.key === 'Escape') cancel(); });
+        side.append(h('form', { class: 'addsub', onsubmit: async ev => {
+          ev.preventDefault();
+          const n = name.value.trim(); if (!n) { name.focus(); return; }
+          const used = new Set(activeSubjects().map(s => s.color));
+          let color = 0; while (used.has(color) && color < 7) color++;
+          if (used.has(color)) color = S.subjects.length % 8;
+          try {
+            const ref = await S.db.collection('subjects').add({ name: n, code: code.value.trim().toUpperCase(), color, archived: false, createdBy: S.meId, createdAt: new Date().toISOString() });
+            name.value = ''; code.value = ''; S.addOpen = false; S.sel = ref.id; savePrefs(); toast(`Added ${n}`); render();
+          } catch (e) { writeErr(e); }
+        } }, name, code, h('div', { style: 'display:flex;gap:6px' }, h('button', { class: 'btn primary', type: 'submit', text: 'Add' }), h('button', { class: 'btn text', type: 'button', onclick: cancel, text: 'Cancel' }))));
+        if (keep.focus === 'new-subj-code') code.focus(); else if (keep.focus === 'new-subj-name') name.focus();
+      }
     }
   }
 
   // ---------- main ----------
+  let menuOpen = false;
   function renderMain() {
-    const main = $('main'); main.replaceChildren();
+    const head = $('mhead'), main = $('mbody');
+    head.replaceChildren(); main.replaceChildren();
+    $('quick').hidden = !(canEdit() && activeSubjects().length && S.subjReady && !S.q);
     if (S.unavailable) {
       main.append(h('div', { class: 'empty' }, h('h3', { text: 'Sign in to open your team’s notebook' }),
-        h('p', { text: 'The notebook is shared through claude.ai. Open this page while signed in to see and add subjects, assignments, tasks and notes.' })));
+        h('p', { text: 'The notebook is shared through claude.ai. Open this page while signed in.' })));
       return;
     }
-    if (!S.subjReady || !S.itemsReady) { main.append(h('div', { class: 'notice', text: 'Loading your team’s notebook…' })); return; }
+    if (!S.subjReady || !S.itemsReady) { main.append(h('div', { class: 'empty' }, h('p', { text: 'Loading…' }))); return; }
     if (!S.subjects.length) {
-      main.append(h('div', { class: 'empty' }, h('h3', { text: 'Start with your first subject' }),
-        h('p', { text: canEdit()
-          ? 'Add each class your team takes, like Mathematics (MAT101) or Software Engineering (CSC2204). Then add assignments, tasks and notes under it. Everyone on the team sees changes live.'
-          : 'No subjects yet. Once a teammate adds one, it shows up here.' })));
+      main.append(h('div', { class: 'empty' }, h('h3', { text: 'Add your first subject' }),
+        h('p', { text: canEdit() ? 'Use “+ Add subject” on the left, for example Mathematics, MAT101. Then add assignments, tasks and notes under it.' : 'No subjects yet. Once a teammate adds one, it shows up here.' }),
+        canEdit() ? h('button', { class: 'btn primary', onclick: () => { S.addOpen = true; renderSide(); $('new-subj-name').focus(); }, text: '+ Add subject' }) : null));
       return;
     }
     if (S.sel !== 'all' && S.sel !== 'mine' && !subjById(S.sel)) S.sel = 'all';
     if (S.sel === 'mine' && !S.meId) S.sel = 'all';
 
-    if (S.q) { renderSearch(main); return; }
+    if (S.q) {
+      const res = sortItems(S.items.filter(i => matchesQuery(i, S.q)));
+      head.append(h('div', { class: 'title-row' }, h('h2', { text: `“${S.q}”` })), h('div', { class: 'summary' }, h('span', { text: `${res.length} result${res.length === 1 ? '' : 's'} in all subjects` })));
+      main.append(res.length ? h('div', { class: 'rows' }, res.map(it => row(it, true))) : h('div', { class: 'empty' }, h('p', { text: 'No matches. Search looks in titles, notes, checklist steps and file names.' })));
+      fillPeople(main);
+      return;
+    }
 
     const subj = (S.sel === 'all' || S.sel === 'mine') ? null : subjById(S.sel);
     const scope = S.items.filter(inScope);
-    renderHero(main, scope);
-
     const open = scope.filter(i => i.status !== 'done');
     const late = open.filter(i => { const d = dueInfo(i.due); return d && d.days < 0; }).length;
-    const week = open.filter(i => { const d = dueInfo(i.due); return d && d.days >= 0 && d.days <= 7; }).length;
-    const assignments = open.filter(i => i.kind === 'assignment').length;
 
-    const head = h('section', { class: 'head', style: `--c:${subj ? subjColor(subj) : 'var(--accent)'}` });
-    const titleText = subj ? subj.name : S.sel === 'mine' ? 'My tasks' : 'All subjects';
-    const subline = subj ? [subj.code, subj.archived ? 'Archived' : ''].filter(Boolean).join(' · ')
-      : S.sel === 'mine' ? 'Items you’re assigned to, or have a checklist step in' : `${activeSubjects().length} subject${activeSubjects().length === 1 ? '' : 's'}`;
-    const acts = h('div', { class: 'tools-l' });
-    if (canEdit()) {
-      acts.append(h('button', { class: 'btn primary', onclick: () => openItem(null) }, '+ New'));
-      if (S.sample) acts.append(h('button', { class: 'btn', onclick: openPlanner }, icon('spark'), 'Plan with AI'));
-    }
-    if (S.downloads) acts.append(h('button', { class: 'btn ghost', onclick: () => exportScope(subj, scope) }, icon('down'), 'Export'));
-    if (subj && canEdit()) acts.append(h('button', { class: 'btn ghost', onclick: () => openSubject(subj) }, icon('edit'), 'Edit subject'));
-    head.append(h('div', { class: 'head-top' }, h('div', {}, h('h2', { text: titleText }), h('div', { class: 'code', text: subline })), acts));
-    head.append(h('div', { class: 'stats' },
-      h('div', { class: 'stat' }, h('b', { text: open.length }), h('span', { class: 'label', text: 'Open' })),
-      h('div', { class: 'stat' }, h('b', { text: assignments }), h('span', { class: 'label', text: 'Assignments open' })),
-      h('div', { class: 'stat' }, h('b', { text: week }), h('span', { class: 'label', text: 'Due in 7 days' })),
-      h('div', { class: 'stat' + (late ? ' late' : '') }, h('b', { text: late }), h('span', { class: 'label', text: 'Overdue' }))));
+    // Title + menu
+    const menuItems = [];
+    if (canEdit()) menuItems.push(['spark', 'Plan with AI', openPlanner, !!S.sample], ['edit', 'New with details', () => openItem(null), true]);
+    if (S.downloads) menuItems.push(['down', 'Export notes', () => exportScope(subj, scope), true]);
+    if (subj && canEdit()) menuItems.push(['cog', 'Edit subject', () => openSubject(subj), true]);
+    const items = menuItems.filter(m => m[3]);
+    const menuBox = h('div', { class: 'menu', hidden: !menuOpen, role: 'menu' }, items.map(([ic, l, fn]) => h('button', { role: 'menuitem', type: 'button', onclick: () => { menuOpen = false; renderMain(); fn(); } }, icon(ic), l)));
+    head.append(h('div', { class: 'title-row' },
+      subj ? h('span', { style: `width:10px;height:10px;border-radius:50%;background:${subjColor(subj)};flex:none` }) : null,
+      h('h2', { text: subj ? subj.name : S.sel === 'mine' ? 'My tasks' : 'All subjects' }),
+      items.length ? h('div', { class: 'menu-wrap' }, h('button', { class: 'iconbtn', type: 'button', 'aria-label': 'More actions', 'aria-expanded': String(menuOpen), onclick: e => { e.stopPropagation(); menuOpen = !menuOpen; renderMain(); } }, icon('dots')), menuBox) : null));
 
-    const seg = (key, opts) => h('div', { class: 'seg', role: 'group' }, opts.map(([v, l, ic]) =>
-      h('button', { 'aria-pressed': String(S[key] === v), onclick: () => { S[key] = v; savePrefs(); render(); } }, ic ? icon(ic) : null, l)));
-    head.append(h('div', { class: 'toolbar' },
-      seg('view', [['list', 'List', 'list'], ['board', 'Board', 'board'], ['calendar', 'Calendar', 'cal']]),
-      seg('kind', [['all', 'Everything'], ['assignment', 'Assignments'], ['task', 'Tasks'], ['note', 'Notes']]),
-      h('span', { class: 'sp' }),
-      S.view === 'list' ? seg('show', [['open', 'Open'], ['done', 'Done'], ['all', 'All']]) : null));
-    main.append(head);
+    // One-line summary with the next deadline countdown
+    const sum = h('div', { class: 'summary' });
+    if (subj && subj.code) sum.append(h('span', { text: subj.code }));
+    if (subj && subj.archived) sum.append(h('span', { text: 'Archived' }));
+    sum.append(h('span', {}, h('b', { text: open.length }), ' open'));
+    if (late) sum.append(h('span', { class: 'late', text: `${late} overdue` }));
+    const nx = nextDeadline(scope);
+    if (nx) sum.append(h('span', { 'data-deadline': nx.t }, 'Next: ', h('button', { onclick: () => openItem(nx.i), text: nx.i.title || 'Untitled' }), ' in ', h('b', { 'data-cd': '1', text: countText(nx.t) })));
+    head.append(sum);
 
-    let items = scope.filter(i => S.kind === 'all' || i.kind === S.kind);
-    if (S.view === 'board') renderBoard(main, items, !subj);
-    else if (S.view === 'calendar') renderCalendar(main, items);
+    // View + filter bar
+    const tabsU = (key, opts) => h('div', { class: 'tabs-u', role: 'group' }, opts.map(([v, l]) =>
+      h('button', { type: 'button', 'aria-pressed': String(S[key] === v), onclick: () => { S[key] = v; savePrefs(); renderMain(); }, text: l })));
+    const kindSel = h('select', { class: 'filter', id: 'kind-filter', 'aria-label': 'Show type', onchange: e => { S.kind = e.target.value; savePrefs(); renderMain(); } },
+      [['all', 'All types'], ['assignment', 'Assignments'], ['task', 'Tasks'], ['note', 'Notes']].map(([v, l]) => h('option', { value: v, selected: S.kind === v, text: l })));
+    main.append(h('div', { class: 'bar' },
+      tabsU('view', [['list', 'List'], ['board', 'Board'], ['calendar', 'Calendar']]),
+      h('span', { class: 'sp' }), kindSel,
+      S.view === 'list' ? h('button', { class: 'filter', type: 'button', onclick: () => { S.show = S.show === 'all' ? 'open' : 'all'; savePrefs(); renderMain(); }, text: S.show === 'all' ? 'Hide done' : 'Show done' }) : null));
+
+    let list = scope.filter(i => S.kind === 'all' || i.kind === S.kind);
+    if (S.view === 'board') renderBoard(main, list, !subj);
+    else if (S.view === 'calendar') renderCalendar(main, list);
     else {
-      if (S.show === 'open') items = items.filter(i => i.status !== 'done');
-      if (S.show === 'done') items = items.filter(i => i.status === 'done');
-      if (!items.length) { main.append(emptyFor()); return; }
-      main.append(h('div', { class: 'list' }, sortItems(items).map(it => card(it, !subj))));
+      if (S.show !== 'all') list = list.filter(i => i.status !== 'done');
+      const doneCount = scope.filter(i => i.status === 'done' && (S.kind === 'all' || i.kind === S.kind)).length;
+      if (!list.length) main.append(emptyFor(doneCount));
+      else main.append(h('div', { class: 'rows' }, sortItems(list).map(it => row(it, !subj))));
+      if (list.length && S.show !== 'all' && doneCount) main.append(h('button', { class: 'linkbtn', style: 'justify-self:start', onclick: () => { S.show = 'all'; savePrefs(); renderMain(); }, text: `${doneCount} done` }));
     }
     fillPeople(main);
   }
+  document.addEventListener('click', e => { if (menuOpen && !e.target.closest('.menu-wrap')) { menuOpen = false; renderMain(); } });
 
-  function emptyFor() {
-    const what = S.kind === 'all' ? 'items' : KINDS[S.kind].toLowerCase() + 's';
+  function emptyFor(doneCount) {
     const mine = S.sel === 'mine';
     return h('div', { class: 'empty' },
-      h('h3', { text: mine ? 'Nothing assigned to you' : S.show === 'done' ? `No finished ${what} yet` : `No open ${what}` }),
-      h('p', { text: mine ? 'When a teammate adds you to an item or a checklist step, it shows up here.'
-        : canEdit() ? 'Type in the quick-add bar, use + New, or paste the lecturer’s brief into Plan with AI to split it into steps.' : 'Nothing here yet.' }),
-      canEdit() && !mine ? h('button', { class: 'btn primary', onclick: () => openItem(null), text: '+ New' }) : null);
+      h('h3', { text: mine ? 'Nothing assigned to you' : doneCount ? 'All done' : 'Nothing here yet' }),
+      h('p', { text: mine ? 'Items you’re added to show up here.'
+        : canEdit() ? 'Type in the box above and press Enter. Try “Quiz 2 friday” or “Read chapter 4 tomorrow @me”.' : '' }));
   }
 
-  function renderSearch(main) {
-    const res = sortItems(S.items.filter(i => matchesQuery(i, S.q)));
-    main.append(h('section', { class: 'head' }, h('div', {}, h('h2', { text: `Search: ${S.q}` }),
-      h('div', { class: 'code', text: `${res.length} result${res.length === 1 ? '' : 's'} across all subjects` }))));
-    if (!res.length) main.append(h('div', { class: 'empty' }, h('h3', { text: 'No matches' }), h('p', { text: 'Search looks in titles, notes, checklist steps, file names and subject names.' })));
-    else main.append(h('div', { class: 'list' }, res.map(it => card(it, true))));
-    fillPeople(main);
-  }
-
-  // Countdown to the next open deadline in view (deadline = end of the due day)
   function nextDeadline(scope) {
     const now = Date.now();
     return scope.filter(i => i.status !== 'done' && i.kind !== 'note' && i.due)
       .map(i => { const d = parseISO(i.due); d.setHours(23, 59, 59); return { i, t: d.getTime() }; })
       .filter(x => x.t >= now).sort((a, b) => a.t - b.t)[0] || null;
   }
-  function countParts(t) {
+  function countText(t) {
     const ms = Math.max(0, t - Date.now());
-    return { d: Math.floor(ms / 86400000), h: Math.floor(ms / 3600000) % 24, m: Math.floor(ms / 60000) % 60 };
-  }
-  function renderHero(main, scope) {
-    const nx = nextDeadline(scope);
-    if (!nx) return;
-    const s = subjById(nx.i.subjectId); const p = countParts(nx.t);
-    const unit = (v, l, k) => h('div', {}, h('b', { 'data-cd': k, text: pad(v) }), h('small', { text: l }));
-    main.append(h('section', { class: 'hero' + (p.d === 0 ? ' late' : ''), 'data-deadline': nx.t },
-      h('div', { style: 'min-width:0' }, h('div', { class: 'label', text: 'Next deadline' }),
-        h('h3', {}, h('button', { onclick: () => openItem(nx.i), text: nx.i.title || 'Untitled' })),
-        h('div', { class: 'sub' }, h('span', { text: s ? (s.code || s.name) : '' }), h('span', { text: KINDS[nx.i.kind] || '' }), h('span', { text: fmtDate(nx.i.due, { weekday: 'long', day: 'numeric', month: 'long' }) }))),
-      h('div', { class: 'count', 'aria-label': `${p.d} days ${p.h} hours left` }, unit(p.d, 'days', 'd'), unit(p.h, 'hours', 'h'), unit(p.m, 'min', 'm'))));
+    const d = Math.floor(ms / 86400000), hr = Math.floor(ms / 3600000) % 24, m = Math.floor(ms / 60000) % 60;
+    return d ? `${d}d ${hr}h` : hr ? `${hr}h ${m}m` : `${m}m`;
   }
   setInterval(() => {
-    const hero = document.querySelector('.hero[data-deadline]'); if (!hero) return;
-    const t = Number(hero.dataset.deadline);
+    const el = document.querySelector('[data-deadline]'); if (!el) return;
+    const t = Number(el.dataset.deadline);
     if (t < Date.now()) { renderMain(); return; }
-    const p = countParts(t);
-    for (const el of hero.querySelectorAll('[data-cd]')) el.textContent = pad(p[el.dataset.cd]);
-  }, 20000);
+    const b = el.querySelector('[data-cd]'); if (b) b.textContent = countText(t);
+  }, 30000);
 
-  function card(it, showSubj, compact) {
+  function shortDue(it) {
     const done = it.status === 'done';
+    const d = dueInfo(it.due, done); if (!d) return null;
+    if (done) return { text: fmtDate(it.due, { day: 'numeric', month: 'short' }), tone: '' };
+    if (d.days < 0) return { text: `${-d.days}d overdue`, tone: 'late' };
+    if (d.days === 0) return { text: 'Today', tone: 'soon' };
+    if (d.days === 1) return { text: 'Tomorrow', tone: 'soon' };
+    if (d.days < 7) return { text: fmtDate(it.due, { weekday: 'short' }), tone: d.days <= 3 ? 'soon' : '' };
+    return { text: fmtDate(it.due, { day: 'numeric', month: 'short' }), tone: '' };
+  }
+
+  function row(it, showSubj, compact) {
     const st = STATUS.includes(it.status) ? it.status : 'todo';
-    const d = dueInfo(it.due, done);
     const s = subjById(it.subjectId);
-    const next = STATUS[(STATUS.indexOf(st) + 1) % STATUS.length];
-    const statusBtn = h('button', { class: 'status', 'data-s': st, disabled: !canEdit(), title: STATUS_LABEL[st],
-      'aria-label': `${STATUS_LABEL[st]}.${canEdit() ? ' Mark as ' + STATUS_LABEL[next] : ''}`, onclick: () => setStatus(it, next) });
+    const next = st === 'done' ? 'todo' : 'done';
     const cl = Array.isArray(it.checklist) ? it.checklist : [];
     const clDone = cl.filter(c => c.done).length;
-    const meta = h('div', { class: 'meta' });
-    if (showSubj && s) meta.append(h('span', { class: 'subj', style: `--c:${subjColor(s)}` }, h('i'), s.code || s.name));
-    if (d) meta.append(h('span', { class: 'due ' + d.tone, text: d.label }));
-    if (st === 'doing' && !compact) meta.append(h('span', { text: 'In progress' }));
-    if (it.kind === 'assignment' && it.weight) meta.append(h('span', { text: `${it.weight}% of grade` }));
-    if (cl.length) meta.append(h('span', { title: 'Checklist' }, icon('check'), `${clDone}/${cl.length}`));
-    if ((it.files || []).length) meta.append(h('span', { title: 'Files' }, icon('clip'), String(it.files.length)));
+    const m = h('div', { class: 'm' });
+    if (showSubj && s) m.append(h('span', { style: `--c:${subjColor(s)}` }, h('i'), s.code || s.name));
+    if (it.kind !== 'task') m.append(h('span', { text: KINDS[it.kind] || 'Note' }));
+    if (st === 'doing') m.append(h('span', { text: 'In progress' }));
+    if (cl.length) m.append(h('span', { text: `${clDone}/${cl.length} steps` }));
+    if ((it.files || []).length) m.append(h('span', { title: 'Files' }, icon('clip'), String(it.files.length)));
     const ids = Array.isArray(it.assignees) ? it.assignees : [];
-    if (ids.length) meta.append(h('span', { class: 'ppl' }, ids.map(u => h('img', { 'data-uid': u, alt: '' }))));
+    if (ids.length) m.append(h('span', { class: 'ppl' }, ids.slice(0, 4).map(u => h('img', { 'data-uid': u, alt: '' }))));
+    const due = shortDue(it);
     const here = viewersOf(it.id);
-    const bodyEl = h('div', { class: 'body' },
-      h('div', { class: 'line1' },
-        h('button', { class: 'ttl', onclick: () => openItem(it), text: it.title || 'Untitled' }),
-        h('span', { class: 'kind ' + (it.kind || 'note'), text: KINDS[it.kind] || 'Note' }),
-        here.length ? h('span', { class: 'here' }, here.slice(0, 3).map(u => h('img', { 'data-uid': u, alt: '' })), 'viewing') : null),
-      meta.childNodes.length ? meta : null,
-      cl.length ? h('div', { class: 'prog', role: 'progressbar', 'aria-valuenow': clDone, 'aria-valuemax': cl.length, 'aria-label': 'Checklist progress' }, h('span', { style: `width:${Math.round(clDone / cl.length * 100)}%` })) : null);
-    if (!compact) {
-      if (it.body) bodyEl.append(h('div', { class: 'note', text: plain(it.body) }));
-      if (cl.length) {
-        const isOpen = S.expanded.has(it.id);
-        bodyEl.append(h('button', { class: 'more', onclick: () => { isOpen ? S.expanded.delete(it.id) : S.expanded.add(it.id); renderMain(); } }, isOpen ? 'Hide checklist' : `Show checklist (${clDone}/${cl.length})`));
-        if (isOpen) bodyEl.append(h('div', { class: 'cl' }, cl.map(c => h('label', {},
-          h('input', { type: 'checkbox', checked: !!c.done, disabled: !canEdit(), onchange: () => toggleCheck(it, c.id) }),
-          h('span', { class: c.done ? 'done-t' : '', text: c.text + (c.due ? ` · by ${fmtDate(c.due, { day: 'numeric', month: 'short' })}` : '') }),
-          c.who ? h('span', { class: 'who' }, h('img', { 'data-uid': c.who, alt: '' })) : h('span')))));
-      }
-    }
-    const el = h('article', { class: 'card' + (done ? ' done' : ''), 'data-id': it.id }, statusBtn, bodyEl);
+    const el = h('div', { class: 'row' + (st === 'done' ? ' done' : ''), 'data-id': it.id },
+      h('button', { class: 'check', 'data-s': st, disabled: !canEdit(), title: st === 'done' ? 'Mark as not done' : 'Mark as done',
+        'aria-label': `${STATUS_LABEL[st]}.${canEdit() ? (st === 'done' ? ' Mark as not done' : ' Mark as done') : ''}`, onclick: () => setStatus(it, next) }),
+      h('div', { class: 'main-c' }, h('button', { class: 't', onclick: () => openItem(it), text: it.title || 'Untitled' }), m.childNodes.length ? m : null),
+      h('div', { class: 'r' + (due ? ' ' + due.tone : '') },
+        here.length ? h('span', { class: 'here', title: 'A teammate has this open' }, h('img', { 'data-uid': here[0], alt: '' })) : null,
+        due ? due.text : null));
     if (compact && canEdit()) {
       el.draggable = true;
       el.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', it.id); e.dataTransfer.effectAllowed = 'move'; el.classList.add('dragging'); });
@@ -817,8 +812,8 @@ textarea.field { min-height: 150px; resize: vertical; line-height: 1.5; }
     const board = h('div', { class: 'board' });
     for (const st of STATUS) {
       const colItems = sortItems(items.filter(i => (STATUS.includes(i.status) ? i.status : 'todo') === st));
-      const col = h('section', { class: 'col', 'aria-label': STATUS_LABEL[st] },
-        h('h4', {}, STATUS_LABEL[st], h('span', { text: colItems.length })), colItems.map(it => card(it, showSubj, true)));
+      const col = h('section', { class: 'col', 'aria-label': STATUS_LABEL[st] }, h('h4', {}, STATUS_LABEL[st], h('span', { text: colItems.length })),
+        colItems.map(it => row(it, showSubj, true)));
       if (canEdit()) {
         col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('over'); });
         col.addEventListener('dragleave', e => { if (!col.contains(e.relatedTarget)) col.classList.remove('over'); });
@@ -831,7 +826,7 @@ textarea.field { min-height: 150px; resize: vertical; line-height: 1.5; }
       board.append(col);
     }
     main.append(board);
-    if (!items.length) main.append(emptyFor());
+    if (canEdit() && items.length) main.append(h('div', { class: 'hint', text: 'Drag items between columns to change their status.' }));
   }
 
   function renderCalendar(main, items) {
@@ -851,22 +846,21 @@ textarea.field { min-height: 150px; resize: vertical; line-height: 1.5; }
       const key = iso(d); const evs = sortItems(byDay[key] || []);
       grid.append(h('div', { class: 'day' + (d.getMonth() !== m - 1 ? ' out' : '') + (key === todayIso ? ' today' : '') + (key === S.calDay ? ' sel' : '') },
         h('button', { class: 'num', onclick: () => { S.calDay = S.calDay === key ? null : key; renderMain(); }, 'aria-label': d.toDateString() + (evs.length ? `, ${evs.length} items` : ''), text: d.getDate() }),
-        evs.slice(0, 3).map(it => { const s = subjById(it.subjectId); return h('button', { class: 'ev' + (it.status === 'done' ? ' done' : ''), style: `--c:${subjColor(s)}`, title: it.title, onclick: () => openItem(it), text: it.title }); }),
-        evs.length > 3 ? h('button', { class: 'ev-more linkbtn', onclick: () => { S.calDay = key; renderMain(); }, text: `+${evs.length - 3} more` }) : null));
+        evs.slice(0, 3).map(it => h('button', { class: 'ev' + (it.status === 'done' ? ' done' : ''), style: `--c:${subjColor(subjById(it.subjectId))}`, title: it.title, onclick: () => openItem(it) }, h('i'), h('span', { text: it.title }))),
+        evs.length > 3 ? h('button', { class: 'ev-more', onclick: () => { S.calDay = key; renderMain(); }, text: `+${evs.length - 3}` }) : null));
     }
-    main.append(h('section', { class: 'cal' },
-      h('div', { class: 'cal-h' }, h('button', { class: 'btn sm', onclick: () => shift(-1), 'aria-label': 'Previous month', text: '‹' }),
-        h('h3', { text: first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' }) }),
-        h('div', { style: 'display:flex;gap:6px' }, h('button', { class: 'btn sm ghost', onclick: () => { S.calMonth = null; S.calDay = null; renderMain(); }, text: 'Today' }),
-          h('button', { class: 'btn sm', onclick: () => shift(1), 'aria-label': 'Next month', text: '›' }))),
-      grid));
+    main.append(h('div', { class: 'cal-h' },
+      h('h3', { text: first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' }) }),
+      h('button', { class: 'iconbtn', onclick: () => shift(-1), 'aria-label': 'Previous month', text: '‹' }),
+      h('button', { class: 'iconbtn', onclick: () => shift(1), 'aria-label': 'Next month', text: '›' }),
+      h('button', { class: 'btn text', onclick: () => { S.calMonth = null; S.calDay = null; renderMain(); }, text: 'Today' })), grid);
     if (S.calDay) {
       const evs = sortItems(byDay[S.calDay] || []);
-      main.append(h('div', { class: 'label', text: fmtDate(S.calDay, { weekday: 'long', day: 'numeric', month: 'long' }) }));
-      main.append(evs.length ? h('div', { class: 'list' }, evs.map(it => card(it, true))) : h('div', { class: 'notice', text: 'Nothing due this day.' }));
+      main.append(h('div', { class: 'sec-h', text: fmtDate(S.calDay, { weekday: 'long', day: 'numeric', month: 'long' }) }));
+      main.append(evs.length ? h('div', { class: 'rows' }, evs.map(it => row(it, true))) : h('div', { class: 'hint', text: 'Nothing due this day.' }));
     }
     const undated = items.filter(i => !i.due && i.status !== 'done' && i.kind !== 'note').length;
-    if (undated) main.append(h('div', { class: 'notice', text: `${undated} open item${undated === 1 ? ' has' : 's have'} no due date, so ${undated === 1 ? 'it isn’t' : 'they aren’t'} on the calendar. Switch to List to see ${undated === 1 ? 'it' : 'them'}.` }));
+    if (undated) main.append(h('div', { class: 'hint', text: `${undated} open item${undated === 1 ? ' has' : 's have'} no due date and ${undated === 1 ? 'isn’t' : 'aren’t'} shown here.` }));
   }
 
   // ---------- overlays ----------
@@ -889,110 +883,118 @@ textarea.field { min-height: 150px; resize: vertical; line-height: 1.5; }
     const edit = canEdit();
     const isNew = !it;
     const base = it ? clone(it) : Object.assign({
-      kind: S.kind !== 'all' ? S.kind : 'assignment', title: '', body: '', due: null, weight: null, status: 'todo',
+      kind: S.kind !== 'all' ? S.kind : 'task', title: '', body: '', due: null, weight: null, status: 'todo',
       assignees: [], checklist: [], files: [], subjectId: (S.sel !== 'all' && S.sel !== 'mine' && subjById(S.sel)) ? S.sel : (activeSubjects()[0] && activeSubjects()[0].id),
     }, preset || {});
     for (const k of ['assignees', 'checklist', 'files']) if (!Array.isArray(base[k])) base[k] = [];
     const v = clone(base);
     const uploaded = new Set();
-    let unsubComments = null, unsubPresence = null, saved = false;
+    let unsubComments = null, saved = false;
 
-    // Fields
+    // Title
+    const title = h('input', { class: 't-in', id: 'ed-title', value: v.title, placeholder: 'Untitled', maxlength: '140', disabled: !edit, 'aria-label': 'Title' });
+
+    // Properties
     const kindSeg = h('div', { class: 'seg', role: 'group', 'aria-label': 'Type' });
     const drawKind = () => kindSeg.replaceChildren(...Object.entries(KINDS).map(([k, l]) => h('button', { type: 'button', 'aria-pressed': String(v.kind === k), disabled: !edit,
-      onclick: () => { v.kind = k; drawKind(); weightF.hidden = k !== 'assignment'; }, text: l })));
-    const title = h('input', { class: 'field', id: 'ed-title', value: v.title, placeholder: 'e.g. Lab report 2: Ohm’s law', maxlength: '140', disabled: !edit });
-    const subjSel = h('select', { class: 'field', id: 'ed-subject', disabled: !edit },
+      onclick: () => { v.kind = k; drawKind(); weightK.hidden = weightV.hidden = k !== 'assignment'; }, text: l })));
+    const subjSel = h('select', { class: 'ghost-in', id: 'ed-subject', disabled: !edit, 'aria-label': 'Subject' },
       S.subjects.filter(s => !s.archived || s.id === v.subjectId).map(s => h('option', { value: s.id, selected: s.id === v.subjectId, text: s.code ? `${s.name} (${s.code})` : s.name })));
-    const due = h('input', { class: 'field', id: 'ed-due', type: 'date', value: v.due || '', disabled: !edit });
-    const status = h('select', { class: 'field', id: 'ed-status', disabled: !edit }, STATUS.map(s => h('option', { value: s, selected: s === v.status, text: STATUS_LABEL[s] })));
-    const weight = h('input', { class: 'field', id: 'ed-weight', type: 'number', min: '0', max: '100', step: '1', value: v.weight || '', placeholder: 'e.g. 20', disabled: !edit });
-    const weightF = h('label', { class: 'f' }, h('span', { text: 'Weight (% of grade)' }), weight);
-    weightF.hidden = v.kind !== 'assignment';
+    const due = h('input', { class: 'ghost-in', id: 'ed-due', type: 'date', value: v.due || '', disabled: !edit, 'aria-label': 'Due date' });
+    const status = h('select', { class: 'ghost-in', id: 'ed-status', disabled: !edit, 'aria-label': 'Status' }, STATUS.map(s => h('option', { value: s, selected: s === v.status, text: STATUS_LABEL[s] })));
+    const weight = h('input', { class: 'ghost-in', id: 'ed-weight', type: 'number', min: '0', max: '100', step: '1', value: v.weight || '', placeholder: 'Empty', disabled: !edit, style: 'width:90px', 'aria-label': 'Weight in percent' });
+    const weightK = h('div', { class: 'k', text: 'Weight' });
+    const weightV = h('div', { class: 'v' }, weight, h('span', { class: 'by', text: ' % of grade' }));
+    weightK.hidden = weightV.hidden = v.kind !== 'assignment';
 
     // People
-    const chips = h('div', { class: 'chips' });
-    const drawChips = () => {
-      chips.replaceChildren(...v.assignees.map(u => h('span', { class: 'chip' }, h('img', { 'data-uid': u, alt: '' }), h('span', { 'data-uid': u, text: '…' }),
-        edit ? h('button', { type: 'button', 'aria-label': 'Remove', onclick: () => { v.assignees = v.assignees.filter(x => x !== u); drawChips(); drawChecklist(); }, text: '×' }) : null)));
-      if (!v.assignees.length) chips.append(h('span', { class: 'by', text: 'Nobody yet' }));
-      fillPeople(chips);
-    };
+    const people = h('div', { class: 'people' });
     const results = h('div', { class: 'results', hidden: true });
-    const search = h('input', { class: 'field', id: 'ed-people', placeholder: 'Add a teammate by name', autocomplete: 'off' });
+    const search = h('input', { class: 'ghost-in', id: 'ed-people', placeholder: '+ Add person', autocomplete: 'off', 'aria-label': 'Add a person' });
     const runSearch = async () => {
       if (!S.user) return;
       const hits = (await S.user.search(search.value.trim())).filter(p => !v.assignees.includes(p.id));
-      results.replaceChildren(...hits.map(p => h('button', { type: 'button', onmousedown: e => e.preventDefault(), onclick: () => { v.assignees.push(p.id); search.value = ''; results.hidden = true; drawChips(); drawChecklist(); } },
+      results.replaceChildren(...hits.map(p => h('button', { type: 'button', onmousedown: e => e.preventDefault(), onclick: () => { v.assignees.push(p.id); search.value = ''; results.hidden = true; drawPeople(); drawChecklist(); search.focus(); } },
         h('img', { src: p.avatarUrl, alt: '' }), h('span', { text: p.isMe ? `${p.name || 'You'} (you)` : (p.name || 'Teammate') }))));
       results.hidden = !hits.length || document.activeElement !== search;
     };
     search.addEventListener('focus', runSearch);
     search.addEventListener('input', runSearch);
     search.addEventListener('blur', () => { results.hidden = true; });
-    const peopleRow = edit && S.user ? h('div', { style: 'display:flex;gap:6px;align-items:center' }, h('div', { class: 'picker' }, search, results),
-      S.meId ? h('button', { class: 'btn ghost sm', type: 'button', onclick: () => { if (!v.assignees.includes(S.meId)) { v.assignees.push(S.meId); drawChips(); drawChecklist(); } }, text: 'Assign me' }) : null) : null;
+    const picker = edit && S.user ? h('div', { class: 'picker' }, search, results) : null;
+    function drawPeople() {
+      people.replaceChildren(...v.assignees.map(u => h('span', { class: 'chip' }, h('img', { 'data-uid': u, alt: '' }), h('span', { 'data-uid': u, text: '…' }),
+        edit ? h('button', { type: 'button', 'aria-label': 'Remove', onclick: () => { v.assignees = v.assignees.filter(x => x !== u); drawPeople(); drawChecklist(); }, text: '×' }) : null)));
+      if (!v.assignees.length && !picker) people.append(h('span', { class: 'by', text: 'Nobody' }));
+      if (picker) people.append(picker);
+      fillPeople(people);
+    }
 
     // Checklist
-    const clBox = h('div', { class: 'cl-ed' });
+    const clBox = h('div', { class: 'sec' });
     function drawChecklist() {
+      const focusId = document.activeElement && document.activeElement.id;
       clBox.replaceChildren();
       const team = [...new Set([...v.assignees, ...v.checklist.map(c => c.who).filter(Boolean)])];
       for (const c of v.checklist) {
-        const who = h('select', { class: 'field cl-who', disabled: !edit, 'aria-label': 'Who does this step', onchange: e => { c.who = e.target.value || null; } },
-          h('option', { value: '', text: 'Anyone' }), team.map(u => h('option', { value: u, selected: c.who === u, 'data-uid': u, text: '…' })));
+        const txt = h('input', { class: 'txt' + (c.done ? ' done' : ''), value: c.text, disabled: !edit, 'aria-label': 'Step', oninput: e => { c.text = e.target.value; } });
         clBox.append(h('div', { class: 'cl-row' },
-          h('input', { type: 'checkbox', checked: !!c.done, disabled: !edit, 'aria-label': 'Done', onchange: e => { c.done = e.target.checked; } }),
-          h('input', { class: 'field', value: c.text, disabled: !edit, 'aria-label': 'Step', oninput: e => { c.text = e.target.value; } }),
-          who,
-          h('input', { class: 'field cl-due', type: 'date', value: c.due || '', disabled: !edit, 'aria-label': 'Step due date', onchange: e => { c.due = e.target.value || null; } }),
-          edit ? h('button', { class: 'x cl-x', type: 'button', 'aria-label': 'Remove step', onclick: () => { v.checklist = v.checklist.filter(x => x !== c); drawChecklist(); }, text: '×' }) : h('span', { class: 'cl-x' })));
+          h('input', { type: 'checkbox', checked: !!c.done, disabled: !edit, 'aria-label': 'Done', onchange: e => { c.done = e.target.checked; txt.classList.toggle('done', c.done); } }),
+          txt,
+          h('span', { class: 'cl-meta', style: 'display:contents' },
+            team.length || c.who ? h('select', { disabled: !edit, 'aria-label': 'Who does this step', onchange: e => { c.who = e.target.value || null; } },
+              h('option', { value: '', text: 'Anyone' }), team.map(u => h('option', { value: u, selected: c.who === u, 'data-uid': u, text: '…' }))) : h('span'),
+            h('input', { type: 'date', value: c.due || '', disabled: !edit, 'aria-label': 'Step due date', onchange: e => { c.due = e.target.value || null; } })),
+          edit ? h('button', { class: 'x', type: 'button', 'aria-label': 'Remove step', onclick: () => { v.checklist = v.checklist.filter(x => x !== c); drawChecklist(); }, text: '×' }) : h('span')));
       }
       if (edit) {
-        const add = h('input', { class: 'field', id: 'ed-cl-new', placeholder: 'Add a step, e.g. Write introduction (press Enter)' });
+        const add = h('input', { class: 'cl-add', id: 'ed-cl-new', placeholder: '+ Add a step' });
         add.addEventListener('keydown', e => {
           if (e.key !== 'Enter') return; e.preventDefault();
           const t = add.value.trim(); if (!t) return;
           v.checklist.push({ id: uid(), text: t, done: false, who: null, due: null }); drawChecklist();
-          const n = $('ed-cl-new'); if (n) n.focus();
         });
         clBox.append(add);
+        if (focusId === 'ed-cl-new') add.focus();
       } else if (!v.checklist.length) clBox.append(h('span', { class: 'by', text: 'No steps' }));
       fillPeople(clBox);
     }
 
-    // Notes (write / preview / AI summary)
-    const body = h('textarea', { class: 'field', id: 'ed-body', placeholder: 'Instructions, lecturer’s requirements, links, lecture notes…\n\nFormatting: # Heading, **bold**, *italic*, - bullet list, 1. numbered list, [link](https://…)', disabled: !edit });
+    // Notes
+    const body = h('textarea', { class: 'notes', id: 'ed-body', placeholder: 'Write notes, instructions, links…  (# heading, **bold**, - list)', disabled: !edit, 'aria-label': 'Notes' });
     body.value = v.body || '';
-    const preview = h('div', { class: 'md md-box', hidden: true });
+    const autosize = () => { body.style.height = 'auto'; body.style.height = Math.max(140, body.scrollHeight + 4) + 'px'; };
+    body.addEventListener('input', autosize);
+    const preview = h('div', { class: 'md', hidden: true });
     let noteMode = edit ? 'write' : 'preview';
-    const noteSeg = h('div', { class: 'seg', role: 'group' });
+    const previewBtn = h('button', { class: 'lnk', type: 'button', hidden: !edit });
     const drawNoteMode = () => {
       body.hidden = noteMode !== 'write'; preview.hidden = noteMode !== 'preview';
-      if (noteMode === 'preview') { preview.innerHTML = md(body.value) || '<p style="color:var(--muted)">No notes yet.</p>'; }
-      noteSeg.replaceChildren(...(edit ? [['write', 'Write'], ['preview', 'Preview']] : []).map(([k, l]) => h('button', { type: 'button', 'aria-pressed': String(noteMode === k), onclick: () => { noteMode = k; drawNoteMode(); }, text: l })));
+      if (noteMode === 'preview') preview.innerHTML = md(body.value) || '<p style="color:var(--faint)">No notes.</p>';
+      previewBtn.textContent = noteMode === 'write' ? 'Preview' : 'Edit';
+      if (noteMode === 'write') requestAnimationFrame(autosize);
     };
+    previewBtn.addEventListener('click', () => { noteMode = noteMode === 'write' ? 'preview' : 'write'; drawNoteMode(); });
     const aiBox = h('div', { class: 'ai-box', hidden: true });
     let aiCtrl = null;
     async function summarize() {
       const text = body.value.trim();
-      if (text.length < 40) { toast('Write a few lines of notes first, then summarize.'); return; }
+      if (text.length < 40) { toast('Write a few lines of notes first.'); return; }
       if (aiCtrl) aiCtrl.abort();
       aiCtrl = new AbortController();
       aiBox.hidden = false;
       const out = h('div', { class: 'md', text: 'Thinking…' });
-      const actions = h('div', { style: 'display:flex;gap:8px;flex-wrap:wrap' });
-      aiBox.replaceChildren(h('div', { class: 'sec-h' }, h('span', {}, icon('spark'), ' Summary'), h('button', { class: 'x', type: 'button', 'aria-label': 'Close summary', onclick: () => { if (aiCtrl) aiCtrl.abort(); aiBox.hidden = true; }, text: '×' })), out, actions);
+      const actions = h('div', { style: 'display:flex;gap:6px' });
+      aiBox.replaceChildren(h('div', { class: 'sec-h' }, icon('spark'), 'Summary', h('span', { class: 'sp' }), h('button', { class: 'x', type: 'button', 'aria-label': 'Close summary', onclick: () => { if (aiCtrl) aiCtrl.abort(); aiBox.hidden = true; }, text: '×' })), out, actions);
       try {
         const r = await S.sample(`You help university students revise. Summarize these study notes into at most 8 short markdown bullet points ("- ..."), keeping key definitions, formulas, dates and deadlines. Reply with only the bullets.\n\nNotes:\n"""\n${text.slice(0, 60000)}\n"""`,
           { signal: aiCtrl.signal, modelTier: 'quick', onText: u => { out.innerHTML = md(u.text); } });
         out.innerHTML = md(r.text);
-        if (edit) actions.append(h('button', { class: 'btn sm', type: 'button', onclick: () => { body.value = body.value.replace(/\s+$/, '') + '\n\n## Summary\n' + r.text.trim() + '\n'; aiBox.hidden = true; noteMode = 'write'; drawNoteMode(); }, text: 'Add to notes' }));
+        if (edit) actions.append(h('button', { class: 'btn', type: 'button', onclick: () => { body.value = body.value.replace(/\s+$/, '') + '\n\n## Summary\n' + r.text.trim() + '\n'; aiBox.hidden = true; noteMode = 'write'; drawNoteMode(); }, text: 'Add to notes' }));
       } catch (e) {
         if (e && e.code === 'cancelled') return;
         out.textContent = e && e.code === 'rate_limited' ? 'Too many requests right now. Try again in a minute.'
           : e && (e.code === 'not_granted' || e.code === 'sampling_disabled') ? 'AI help isn’t allowed for you on this page.' : 'Couldn’t summarize. Try again.';
-        if (e && e.text) out.innerHTML = md(e.text);
       }
     }
 
@@ -1022,25 +1024,25 @@ textarea.field { min-height: 150px; resize: vertical; line-height: 1.5; }
       filesBox.replaceChildren();
       const imgs = v.files.filter(f => /^image\//.test(f.type));
       if (imgs.length) filesBox.append(h('div', { class: 'thumbs' }, imgs.map(f => h('a', { href: '/_blob/' + f.id, target: '_blank', rel: 'noopener', title: f.name }, h('img', { src: '/_blob/' + f.id, alt: f.name, loading: 'lazy' })))));
-      for (const f of v.files) filesBox.append(h('div', { class: 'file' }, icon(/^image\//.test(f.type) ? 'file' : 'clip'),
+      for (const f of v.files) filesBox.append(h('div', { class: 'file' }, icon('file'),
         h('a', { href: '/_blob/' + f.id, target: '_blank', rel: 'noopener', text: f.name }), h('small', { text: fmtSize(f.size || 0) }),
-        edit ? h('button', { class: 'x', type: 'button', 'aria-label': `Remove ${f.name}`, onclick: () => { v.files = v.files.filter(x => x !== f); drawFiles(); }, text: '×' }) : h('span')));
-      if (edit && S.assets) {
-        const drop = h('div', { class: 'drop', role: 'button', tabindex: '0', onclick: () => fileInput.click(), onkeydown: e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } } },
-          h('span', {}, icon('clip'), ' Attach files: drop here or click'), h('small', { text: 'PDF, images, text files · up to 20 MB each' }));
-        drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
-        drop.addEventListener('dragleave', () => drop.classList.remove('over'));
-        drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); upload([...e.dataTransfer.files]); });
-        filesBox.append(drop);
-      } else if (!v.files.length) filesBox.append(h('span', { class: 'by', text: 'No files' }));
+        edit ? h('button', { class: 'x', type: 'button', 'aria-label': `Remove ${f.name}`, onclick: () => { v.files = v.files.filter(x => x !== f); drawFiles(); }, text: '×' }) : null));
+      if (!v.files.length) filesBox.append(h('span', { class: 'by', text: edit && S.assets ? 'Drop PDFs or photos here' : 'No files' }));
+    }
+    const filesSec = h('div', { class: 'sec' }, h('div', { class: 'sec-h' }, 'Files', h('span', { class: 'sp' }),
+      edit && S.assets ? h('button', { class: 'lnk', type: 'button', onclick: () => fileInput.click() }, icon('clip'), 'Attach') : null), filesBox, fileInput);
+    if (edit && S.assets) {
+      filesSec.addEventListener('dragover', e => { e.preventDefault(); filesSec.classList.add('drop-over'); });
+      filesSec.addEventListener('dragleave', e => { if (!filesSec.contains(e.relatedTarget)) filesSec.classList.remove('drop-over'); });
+      filesSec.addEventListener('drop', e => { e.preventDefault(); filesSec.classList.remove('drop-over'); upload([...e.dataTransfer.files]); });
     }
 
     // Comments
-    const cmBox = h('div', { class: 'comments' });
+    let cmSec = null;
     if (!isNew) {
-      const list = h('div', { class: 'comments' });
-      const ta = h('textarea', { class: 'field', id: 'ed-comment', placeholder: 'Write a comment…', rows: '2' });
-      const post = h('button', { class: 'btn sm', type: 'button', text: 'Post' });
+      const list = h('div', { class: 'comments' }, h('span', { class: 'by', text: 'Loading…' }));
+      const ta = h('textarea', { class: 'field', id: 'ed-comment', placeholder: 'Write a comment…', rows: '1' });
+      const post = h('button', { class: 'btn', type: 'button', text: 'Send' });
       const send = async () => {
         const t = ta.value.trim(); if (!t) return;
         post.disabled = true;
@@ -1049,34 +1051,31 @@ textarea.field { min-height: 150px; resize: vertical; line-height: 1.5; }
         post.disabled = false;
       };
       post.addEventListener('click', send);
-      ta.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); send(); } });
-      cmBox.append(list, edit ? h('div', { class: 'cm-new' }, ta, post) : null);
-      list.append(h('span', { class: 'by', text: 'Loading comments…' }));
+      ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+      cmSec = h('div', { class: 'sec' }, h('div', { class: 'sec-h', text: 'Comments' }), list, edit ? h('div', { class: 'cm-new' }, ta, post) : null);
       unsubComments = S.db.collection('items/' + it.id + '/comments').orderBy('at').limit(300).onSnapshot(snap => {
         list.replaceChildren();
-        if (snap.empty) list.append(h('span', { class: 'by', text: 'No comments yet. Ask who’s doing what, share progress, or leave a reminder.' }));
+        if (snap.empty) list.append(h('span', { class: 'by', text: 'No comments yet.' }));
         for (const d of snap.docs) {
           const c = d.data();
           list.append(h('div', { class: 'cm' }, h('img', { 'data-uid': c.by || '', alt: '' }), h('div', { style: 'min-width:0' },
             h('div', { class: 'h' }, h('b', { 'data-uid': c.by || '', text: 'Teammate' }), h('small', { text: c.at ? new Date(c.at).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) : '' }),
               c.by && c.by === S.meId && edit ? h('button', { type: 'button', onclick: async () => { try { await S.db.doc('items/' + it.id + '/comments/' + d.id).delete(); } catch (e) { writeErr(e); } }, text: 'Delete' }) : null),
-            h('div', { class: 't', text: c.text || '' }))));
+            h('div', { class: 'tx', text: c.text || '' }))));
         }
         fillPeople(list);
-      }, () => { list.replaceChildren(h('span', { class: 'by', text: 'Comments couldn’t load. Reopen this item to try again.' })); });
+      }, () => { list.replaceChildren(h('span', { class: 'by', text: 'Comments couldn’t load. Reopen to try again.' })); });
     }
 
-    // Who else is here
+    // Who else has it open
     const hereBox = h('div', { hidden: true });
     const drawHere = () => {
       if (isNew) return;
       const ids = viewersOf(it.id);
       hereBox.hidden = !ids.length;
-      hereBox.replaceChildren(h('div', { class: 'alsohere' }, h('span', { class: 'live' }), h('span', { class: 'ppl' }, ids.map(u => h('img', { 'data-uid': u, alt: '' }))),
-        h('span', { text: `${ids.length === 1 ? 'A teammate has' : ids.length + ' teammates have'} this open too. Only the fields you change are saved.` })));
+      hereBox.replaceChildren(h('div', { class: 'alsohere' }, h('span', { class: 'ppl' }, ids.map(u => h('img', { 'data-uid': u, alt: '' }))), h('span', { text: 'Also viewing now' })));
       fillPeople(hereBox);
     };
-    unsubPresence = drawHere;
 
     // Footer
     const foot = h('div', { class: 'drawer-f' });
@@ -1084,20 +1083,21 @@ textarea.field { min-height: 150px; resize: vertical; line-height: 1.5; }
     const drawFoot = confirming => {
       foot.replaceChildren();
       if (confirming) {
-        foot.append(h('span', { text: 'Delete this for the whole team?' }), h('div', { class: 'r' },
-          h('button', { class: 'btn', type: 'button', onclick: () => drawFoot(false), text: 'Keep it' }),
+        foot.append(h('span', { text: 'Delete for everyone?' }), h('span', { class: 'sp' }),
+          h('button', { class: 'btn text', type: 'button', onclick: () => drawFoot(false), text: 'Keep' }),
           h('button', { class: 'btn danger solid', type: 'button', onclick: async e => {
             e.currentTarget.disabled = true;
             try { await deleteItem(it); saved = true; close(); toast('Deleted'); } catch (err) { writeErr(err); drawFoot(false); }
-          }, text: 'Delete' })));
+          }, text: 'Delete' }));
         return;
       }
-      if (!isNew && edit) foot.append(h('button', { class: 'btn danger', type: 'button', onclick: () => drawFoot(true), text: 'Delete' }));
-      foot.append(h('div', { class: 'r' }, h('button', { class: 'btn', type: 'button', onclick: () => close(), text: edit ? 'Cancel' : 'Close' }), edit ? saveBtn : null));
+      if (!isNew && edit) foot.append(h('button', { class: 'btn text danger', type: 'button', onclick: () => drawFoot(true), text: 'Delete' }));
+      else if (!isNew && it.createdBy) foot.append(h('span', { class: 'by' }, 'Added by ', h('span', { 'data-uid': it.createdBy, text: '…' })));
+      foot.append(h('span', { class: 'sp' }), h('button', { class: 'btn text', type: 'button', onclick: () => close(), text: edit ? 'Cancel' : 'Close' }), edit ? saveBtn : null);
+      fillPeople(foot);
     };
     drawFoot(false);
 
-    const section = (label, extra, ...content) => h('div', { class: 'f' }, h('div', { class: 'sec-h' }, h('span', { text: label }), extra), ...content);
     const form = h('form', { class: 'drawer', role: 'dialog', 'aria-modal': 'true', 'aria-label': isNew ? 'New item' : 'Item details', onsubmit: async ev => {
       ev.preventDefault();
       if (!edit) return;
@@ -1120,27 +1120,27 @@ textarea.field { min-height: 150px; resize: vertical; line-height: 1.5; }
           const kept = new Set(v.files.map(f => f.id));
           if (S.assets) for (const f of base.files) if (!kept.has(f.id)) { try { await S.assets.delete(f.id); } catch (e) {} }
         }
-        saved = true; close(); toast(isNew ? `Added ${KINDS[v.kind].toLowerCase()}` : 'Saved');
+        saved = true; close(); toast(isNew ? 'Added' : 'Saved');
       } catch (e) { saveBtn.disabled = false; writeErr(e); }
     } },
-      h('div', { class: 'drawer-h' }, h('h3', { text: isNew ? 'New item' : edit ? 'Edit item' : 'Item' }), h('button', { class: 'x', type: 'button', 'aria-label': 'Close', onclick: () => close(), text: '×' })),
+      h('div', { class: 'drawer-h' }, hereBox, h('span', { class: 'sp', style: 'flex:1' }), h('button', { class: 'iconbtn', type: 'button', 'aria-label': 'Close', onclick: () => close() }, icon('close'))),
       h('div', { class: 'drawer-b' },
-        hereBox,
-        kindSeg,
-        h('label', { class: 'f' }, h('span', { text: 'Title' }), title),
-        h('div', { class: 'frow' }, h('label', { class: 'f' }, h('span', { text: 'Subject' }), subjSel), h('label', { class: 'f' }, h('span', { text: 'Due date' }), due)),
-        h('div', { class: 'frow' }, h('label', { class: 'f' }, h('span', { text: 'Status' }), status), weightF),
-        section('Who’s on it', null, chips, peopleRow),
-        section('Checklist', null, clBox),
-        section('Notes', h('div', { style: 'display:flex;gap:6px;align-items:center' },
-          S.sample ? h('button', { class: 'btn ghost sm', type: 'button', onclick: summarize }, icon('spark'), 'Summarize') : null, noteSeg), body, preview, aiBox),
-        section('Files', null, filesBox, fileInput),
-        !isNew ? section('Comments', null, cmBox) : null,
-        !isNew && it.createdBy ? h('div', { class: 'by' }, 'Added by ', h('span', { 'data-uid': it.createdBy, text: '…' }),
-          it.updatedAt ? ` · last changed ${new Date(it.updatedAt).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })}` : '') : null),
+        title,
+        h('div', { class: 'props' },
+          h('div', { class: 'k', text: 'Type' }), h('div', { class: 'v' }, kindSeg),
+          h('div', { class: 'k', text: 'Subject' }), h('div', { class: 'v' }, subjSel),
+          h('div', { class: 'k', text: 'Due' }), h('div', { class: 'v' }, due),
+          h('div', { class: 'k', text: 'Status' }), h('div', { class: 'v' }, status),
+          weightK, weightV,
+          h('div', { class: 'k', text: 'People' }), h('div', { class: 'v' }, people)),
+        h('div', { class: 'sec' }, h('div', { class: 'sec-h', text: 'Checklist' }), clBox),
+        h('div', { class: 'sec' }, h('div', { class: 'sec-h' }, 'Notes', h('span', { class: 'sp' }),
+          S.sample ? h('button', { class: 'lnk', type: 'button', onclick: summarize }, icon('spark'), 'Summarize') : null, previewBtn), body, preview, aiBox),
+        filesSec,
+        cmSec),
       foot);
 
-    drawKind(); drawChips(); drawChecklist(); drawNoteMode(); drawFiles(); drawHere();
+    drawKind(); drawPeople(); drawChecklist(); drawNoteMode(); drawFiles(); drawHere();
     const close = showLayer(form, { onClose: () => {
       if (unsubComments) unsubComments();
       if (aiCtrl) aiCtrl.abort();
@@ -1148,7 +1148,7 @@ textarea.field { min-height: 150px; resize: vertical; line-height: 1.5; }
       setPresence(null);
       if (!saved && S.assets) for (const id of uploaded) S.assets.delete(id).catch(() => {});
     } });
-    drawerHere = unsubPresence;
+    drawerHere = drawHere;
     setPresence(isNew ? null : it.id);
     fillPeople(form);
     if (edit && isNew) title.focus();
@@ -1295,7 +1295,7 @@ ${text.slice(0, 60000)}
     if (user) {
       const [me, can] = await Promise.all([user.me(), user.can('data.write')]);
       S.meId = me.id; S.canWrite = can;
-      $('me').replaceChildren(h('img', { src: me.avatarUrl, alt: '' }), h('span', { text: me.name || 'You' }));
+      $('me').replaceChildren(h('img', { src: me.avatarUrl, alt: me.name || 'You', title: me.name || 'You' }));
     }
     if (room) {
       S.room = room;
