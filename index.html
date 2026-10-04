@@ -32,7 +32,7 @@ a:hover { text-decoration: underline; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 svg.i { width: 16px; height: 16px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
-.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 24px; padding-block: 20px 64px; }
+.wrap { max-width: 860px; margin: 0 auto; padding-inline: 24px; padding-block: 20px 64px; }
 .top { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
 .brand { font-size: 16px; font-weight: 700; margin: 0; letter-spacing: -.01em; }
 .top .sp { flex: 1; }
@@ -48,7 +48,24 @@ svg.i { width: 16px; height: 16px; flex: none; stroke: currentColor; fill: none;
 .iconbtn:hover { background: var(--hover); color: var(--ink); }
 .me img { width: 28px; height: 28px; border-radius: 50%; display: block; }
 
-.grid { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; align-items: start; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr); }
+.spick { flex: none; }
+.pick-btn { display: inline-flex; align-items: center; gap: 10px; border: 0; background: none; padding: 2px 8px; margin-left: -8px; border-radius: 8px; text-align: left; }
+.pick-btn:hover, .pick-btn[aria-expanded="true"] { background: var(--hover); }
+.title-row .pick-btn h2 { flex: none; max-width: calc(100vw - 130px); overflow-wrap: normal; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -.02em; line-height: 1.2; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pick-btn svg { color: var(--muted); width: 20px; height: 20px; }
+.tdot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.menu.sdrop { left: -8px; right: auto; min-width: 280px; max-width: min(360px, calc(100vw - 32px)); max-height: 65vh; overflow-y: auto; }
+.menu.sdrop hr { border: 0; border-top: 1px solid var(--line); margin: 4px 6px; }
+.sopt { display: flex !important; align-items: center; gap: 10px; width: 100%; }
+.sopt .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c); flex: none; }
+.sopt .dot.none { background: none; width: 8px; display: grid; place-items: center; color: var(--muted); font-size: 15px; }
+.sopt .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sopt .code { font-size: 12px; color: var(--faint); }
+.sopt .n { font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; min-width: 14px; text-align: right; }
+.sopt[aria-checked="true"] { background: var(--hover); font-weight: 600; }
+.sopt.muted { color: var(--muted); }
+.sopt.arch { opacity: .6; }
 
 /* Sidebar */
 .side { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); display: grid; gap: 2px; }
@@ -279,7 +296,7 @@ textarea.field { min-height: 120px; resize: vertical; }
   .wrap { padding-inline: 16px; }
   .top { margin-bottom: 16px; flex-wrap: wrap; }
   .search { order: 5; width: 100%; }
-  .grid { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .pick-btn h2 { font-size: 23px; }
   .side { position: static; display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px; }
   .side .tab { width: auto; flex: none; max-width: 200px; }
   .side hr { display: none; }
@@ -312,7 +329,6 @@ textarea.field { min-height: 120px; resize: vertical; }
     <div class="me" id="me"></div>
   </header>
   <div class="grid">
-    <nav class="side" id="side" aria-label="Subjects"></nav>
     <main class="main">
       <div class="mhead" id="mhead"></div>
       <form class="quick" id="quick" hidden>
@@ -383,6 +399,7 @@ textarea.field { min-height: 120px; resize: vertical; }
     moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
     dots: '<circle cx="5" cy="12" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="19" cy="12" r="1.3" fill="currentColor"/>',
     cog: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+    chev: '<path d="m6 9 6 6 6-6"/>',
     close: '<path d="M6 6l12 12M18 6 6 18"/>',
     auto: '<circle cx="12" cy="12" r="8"/><path d="M12 4v16" /><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>',
   };
@@ -617,47 +634,57 @@ textarea.field { min-height: 120px; resize: vertical; }
 
   // ---------- sidebar ----------
   function renderSide() {
-    const side = $('side');
-    const keep = { name: $('new-subj-name') ? $('new-subj-name').value : '', code: $('new-subj-code') ? $('new-subj-code').value : '', focus: document.activeElement && document.activeElement.id };
-    side.replaceChildren();
     $('quick').hidden = !(canEdit() && activeSubjects().length && S.subjReady && !S.q);
+  }
+
+  // Subject dropdown (the page title)
+  let subjOpen = false;
+  function subjectPicker(label, color) {
     const open = S.items.filter(i => i.status !== 'done');
-    const tab = (id, name, color, count, arch) => h('button', {
-      class: 'tab' + (arch ? ' arch' : ''), 'aria-current': String(S.sel === id), style: color ? `--c:${color}` : null,
-      onclick: () => { S.sel = id; S.calDay = null; savePrefs(); render(); }
-    }, color ? h('span', { class: 'dot' }) : null, h('span', { class: 'nm', text: name }), h('span', { class: 'n', text: S.itemsReady && count ? count : '' }));
-
-    if (S.meId) side.append(tab('mine', 'My tasks', null, open.filter(i => isMine(i) && !isArchivedSubj(i.subjectId)).length));
-    side.append(tab('all', 'All subjects', null, open.filter(i => !isArchivedSubj(i.subjectId)).length));
-    if (S.subjects.length) side.append(h('hr'));
-    for (const s of activeSubjects()) side.append(tab(s.id, s.name, subjColor(s), open.filter(i => i.subjectId === s.id).length));
-    const archived = S.subjects.filter(s => s.archived);
-    if (S.showArchived) for (const s of archived) side.append(tab(s.id, s.name, subjColor(s), 0, true));
-    if (archived.length) side.append(h('button', { class: 'linkbtn', onclick: () => { S.showArchived = !S.showArchived; render(); }, text: S.showArchived ? 'Hide archived' : `Archived (${archived.length})` }));
-
-    if (canEdit()) {
-      if (!S.addOpen) {
-        side.append(h('button', { class: 'linkbtn', onclick: () => { S.addOpen = true; renderSide(); $('new-subj-name').focus(); }, text: '+ Add subject' }));
-      } else {
-        const name = h('input', { class: 'field', id: 'new-subj-name', placeholder: 'Subject name', maxlength: '60', 'aria-label': 'Subject name' });
-        const code = h('input', { class: 'field', id: 'new-subj-code', placeholder: 'Code (optional)', maxlength: '12', 'aria-label': 'Subject code' });
-        name.value = keep.name; code.value = keep.code;
-        const cancel = () => { S.addOpen = false; renderSide(); };
-        for (const el of [name, code]) el.addEventListener('keydown', e => { if (e.key === 'Escape') cancel(); });
-        side.append(h('form', { class: 'addsub', onsubmit: async ev => {
-          ev.preventDefault();
-          const n = name.value.trim(); if (!n) { name.focus(); return; }
-          const used = new Set(activeSubjects().map(s => s.color));
-          let color = 0; while (used.has(color) && color < 7) color++;
-          if (used.has(color)) color = S.subjects.length % 8;
-          try {
-            const ref = await S.db.collection('subjects').add({ name: n, code: code.value.trim().toUpperCase(), color, archived: false, createdBy: S.meId, createdAt: new Date().toISOString() });
-            name.value = ''; code.value = ''; S.addOpen = false; S.sel = ref.id; savePrefs(); toast(`Added ${n}`); render();
-          } catch (e) { writeErr(e); }
-        } }, name, code, h('div', { style: 'display:flex;gap:6px' }, h('button', { class: 'btn primary', type: 'submit', text: 'Add' }), h('button', { class: 'btn text', type: 'button', onclick: cancel, text: 'Cancel' }))));
-        if (keep.focus === 'new-subj-code') code.focus(); else if (keep.focus === 'new-subj-name') name.focus();
-      }
+    const opt = (id, name, opts = {}) => h('button', {
+      type: 'button', role: 'menuitemradio', 'aria-checked': String(S.sel === id), class: 'sopt' + (opts.arch ? ' arch' : ''), style: opts.color ? `--c:${opts.color}` : null,
+      onclick: () => { subjOpen = false; S.sel = id; S.calDay = null; savePrefs(); render(); }
+    }, opts.color ? h('span', { class: 'dot' }) : h('span', { class: 'dot none' }), h('span', { class: 'nm', text: name }),
+      opts.code ? h('span', { class: 'code', text: opts.code }) : null, h('span', { class: 'n', text: opts.count || '' }));
+    const list = h('div', { class: 'menu sdrop', role: 'menu', hidden: !subjOpen });
+    if (S.meId) list.append(opt('mine', 'My tasks', { count: open.filter(i => isMine(i) && !isArchivedSubj(i.subjectId)).length }));
+    list.append(opt('all', 'All subjects', { count: open.filter(i => !isArchivedSubj(i.subjectId)).length }));
+    if (activeSubjects().length) list.append(h('hr'));
+    for (const s of activeSubjects()) list.append(opt(s.id, s.name, { color: subjColor(s), code: s.code, count: open.filter(i => i.subjectId === s.id).length }));
+    const archived = S.subjects.filter(x => x.archived);
+    if (archived.length) {
+      list.append(h('hr'));
+      if (S.showArchived) for (const s of archived) list.append(opt(s.id, s.name, { color: subjColor(s), code: s.code, arch: true }));
+      list.append(h('button', { type: 'button', class: 'sopt muted', onclick: e => { e.stopPropagation(); S.showArchived = !S.showArchived; renderMain(); } },
+        h('span', { class: 'dot none' }), h('span', { class: 'nm', text: S.showArchived ? 'Hide archived' : `Show archived (${archived.length})` })));
     }
+    if (canEdit()) list.append(h('hr'), h('button', { type: 'button', class: 'sopt muted', onclick: () => { subjOpen = false; renderMain(); openNewSubject(); } },
+      h('span', { class: 'dot none', text: '+' }), h('span', { class: 'nm', text: 'Add subject' })));
+    return h('div', { class: 'menu-wrap spick' },
+      h('button', { type: 'button', class: 'pick-btn', 'aria-haspopup': 'menu', 'aria-expanded': String(subjOpen), onclick: e => { e.stopPropagation(); subjOpen = !subjOpen; menuOpen = false; renderMain(); } },
+        color ? h('span', { class: 'tdot', style: `background:${color}` }) : null, h('h2', { text: label }), icon('chev')),
+      list);
+  }
+
+  function openNewSubject() {
+    const name = h('input', { class: 'field', id: 'new-subj-name', placeholder: 'e.g. Mathematics', maxlength: '60' });
+    const code = h('input', { class: 'field', id: 'new-subj-code', placeholder: 'e.g. MAT101', maxlength: '12' });
+    const form = h('form', { class: 'modal', onsubmit: async ev => {
+      ev.preventDefault();
+      const n = name.value.trim(); if (!n) { name.focus(); return; }
+      const used = new Set(activeSubjects().map(s => s.color));
+      let color = 0; while (used.has(color) && color < 7) color++;
+      if (used.has(color)) color = S.subjects.length % 8;
+      try {
+        const ref = await S.db.collection('subjects').add({ name: n, code: code.value.trim().toUpperCase(), color, archived: false, createdBy: S.meId, createdAt: new Date().toISOString() });
+        S.sel = ref.id; savePrefs(); closeN(); toast(`Added ${n}`); render();
+      } catch (e) { writeErr(e); }
+    } },
+      h('h3', { text: 'New subject' }),
+      h('div', { class: 'frow' }, h('label', { class: 'f' }, h('span', { text: 'Name' }), name), h('label', { class: 'f' }, h('span', { text: 'Code (optional)' }), code)),
+      h('div', { style: 'display:flex;gap:8px;justify-content:flex-end' }, h('button', { class: 'btn text', type: 'button', onclick: () => closeN(), text: 'Cancel' }), h('button', { class: 'btn primary', type: 'submit', text: 'Add subject' })));
+    const closeN = showLayer(form, { center: true });
+    name.focus();
   }
 
   // ---------- main ----------
@@ -674,8 +701,8 @@ textarea.field { min-height: 120px; resize: vertical; }
     if (!S.subjReady || !S.itemsReady) { main.append(h('div', { class: 'empty' }, h('p', { text: 'Loading…' }))); return; }
     if (!S.subjects.length) {
       main.append(h('div', { class: 'empty' }, h('h3', { text: 'Add your first subject' }),
-        h('p', { text: canEdit() ? 'Use “+ Add subject” on the left, for example Mathematics, MAT101. Then add assignments, tasks and notes under it.' : 'No subjects yet. Once a teammate adds one, it shows up here.' }),
-        canEdit() ? h('button', { class: 'btn primary', onclick: () => { S.addOpen = true; renderSide(); $('new-subj-name').focus(); }, text: '+ Add subject' }) : null));
+        h('p', { text: canEdit() ? 'For example Mathematics, MAT101. Then add assignments, tasks and notes under it.' : 'No subjects yet. Once a teammate adds one, it shows up here.' }),
+        canEdit() ? h('button', { class: 'btn primary', onclick: openNewSubject, text: '+ Add subject' }) : null));
       return;
     }
     if (S.sel !== 'all' && S.sel !== 'mine' && !subjById(S.sel)) S.sel = 'all';
@@ -702,9 +729,9 @@ textarea.field { min-height: 120px; resize: vertical; }
     const items = menuItems.filter(m => m[3]);
     const menuBox = h('div', { class: 'menu', hidden: !menuOpen, role: 'menu' }, items.map(([ic, l, fn]) => h('button', { role: 'menuitem', type: 'button', onclick: () => { menuOpen = false; renderMain(); fn(); } }, icon(ic), l)));
     head.append(h('div', { class: 'title-row' },
-      subj ? h('span', { style: `width:10px;height:10px;border-radius:50%;background:${subjColor(subj)};flex:none` }) : null,
-      h('h2', { text: subj ? subj.name : S.sel === 'mine' ? 'My tasks' : 'All subjects' }),
-      items.length ? h('div', { class: 'menu-wrap' }, h('button', { class: 'iconbtn', type: 'button', 'aria-label': 'More actions', 'aria-expanded': String(menuOpen), onclick: e => { e.stopPropagation(); menuOpen = !menuOpen; renderMain(); } }, icon('dots')), menuBox) : null));
+      subjectPicker(subj ? subj.name : S.sel === 'mine' ? 'My tasks' : 'All subjects', subj ? subjColor(subj) : null),
+      h('span', { style: 'flex:1' }),
+      items.length ? h('div', { class: 'menu-wrap' }, h('button', { class: 'iconbtn', type: 'button', 'aria-label': 'More actions', 'aria-expanded': String(menuOpen), onclick: e => { e.stopPropagation(); menuOpen = !menuOpen; subjOpen = false; renderMain(); } }, icon('dots')), menuBox) : null));
 
     // One-line summary with the next deadline countdown
     const sum = h('div', { class: 'summary' });
@@ -738,7 +765,8 @@ textarea.field { min-height: 120px; resize: vertical; }
     }
     fillPeople(main);
   }
-  document.addEventListener('click', e => { if (menuOpen && !e.target.closest('.menu-wrap')) { menuOpen = false; renderMain(); } });
+  document.addEventListener('click', e => { if ((menuOpen || subjOpen) && !e.target.closest('.menu-wrap')) { menuOpen = false; subjOpen = false; renderMain(); } });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && (menuOpen || subjOpen)) { menuOpen = false; subjOpen = false; renderMain(); } });
 
   function emptyFor(doneCount) {
     const mine = S.sel === 'mine';
