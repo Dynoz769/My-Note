@@ -116,11 +116,33 @@ svg.i { width: 16px; height: 16px; flex: none; stroke: currentColor; fill: none;
 .quick > svg { color: var(--faint); }
 .quick input { border: 0; background: none; padding: 8px 0; min-width: 0; outline: none; }
 .quick input::placeholder { color: var(--faint); }
-.qprev { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 6px; font-size: 12.5px; color: var(--muted); }
+.qprev { grid-column: 1 / -1; display: grid; gap: 6px; padding: 2px 8px 8px 0; min-width: 0; }
 .qprev:empty { display: none; }
-.qprev span { display: inline-flex; align-items: center; gap: 5px; }
-.qprev span:not(:last-child)::after { content: "·"; margin-left: 6px; color: var(--faint); }
-.qprev i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+.qgroup { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+.qgroup .sp { flex: 1; }
+.qchip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 99px; padding: 3px 11px; font-size: 13px; white-space: nowrap; }
+.qchip:hover { color: var(--ink); border-color: var(--faint); }
+.qchip.on { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.qchip i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+.qdate { border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 99px; padding: 2px 8px; font-size: 13px; }
+.qlink { border: 0; background: none; color: var(--accent); font-size: 13px; padding: 3px 4px; white-space: nowrap; }
+.qlink:hover { text-decoration: underline; }
+.qhint { font-size: 12px; color: var(--faint); white-space: nowrap; }
+.col-add { border: 0; background: none; padding: 9px 8px; font-size: 14px; outline: none; width: 100%; border-radius: 7px; }
+.col-add::placeholder { color: var(--faint); }
+.col-add:hover { background: var(--hover); }
+.col-add:focus { background: var(--surface); box-shadow: 0 0 0 1px var(--accent); }
+.day { cursor: pointer; }
+.paste-prev { display: grid; gap: 2px; max-height: 200px; overflow-y: auto; }
+.paste-prev:empty { display: none; }
+.pp { display: flex; align-items: center; gap: 8px; font-size: 14px; padding: 3px 0; }
+.pp .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tpls { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
+.tpl { display: grid; gap: 2px; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 12px; }
+.tpl:hover { border-color: var(--accent); }
+.tpl b { font-weight: 600; font-size: 14.5px; }
+.tpl span { font-size: 12.5px; color: var(--muted); }
+.fab { display: none; }
 
 .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; border-bottom: 1px solid var(--line); }
 .tabs-u { display: flex; gap: 16px; overflow-x: auto; }
@@ -297,6 +319,11 @@ textarea.field { min-height: 120px; resize: vertical; }
   .top { margin-bottom: 16px; flex-wrap: wrap; }
   .search { order: 5; width: 100%; }
   .pick-btn h2 { font-size: 23px; }
+  .qgroup { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .qgroup::-webkit-scrollbar { display: none; }
+  .fab { display: grid; place-items: center; position: fixed; right: 18px; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); width: 54px; height: 54px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); box-shadow: 0 8px 24px var(--shadow); z-index: 15; }
+  .fab svg { width: 24px; height: 24px; stroke-width: 2.2; }
+  .wrap { padding-bottom: 96px; }
   .side { position: static; display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px; }
   .side .tab { width: auto; flex: none; max-width: 200px; }
   .side hr { display: none; }
@@ -341,6 +368,7 @@ textarea.field { min-height: 120px; resize: vertical; }
     </main>
   </div>
 </div>
+<button class="fab" id="fab" type="button" aria-label="Add a task" hidden><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
 <div id="layer"></div>
 <div id="toast" class="toast" role="status" hidden></div>
 
@@ -508,7 +536,8 @@ textarea.field { min-height: 120px; resize: vertical; }
 
   async function setStatus(it, status) {
     try { await S.db.doc('items/' + it.id).update({ status, updatedAt: new Date().toISOString() }); }
-    catch (e) { writeErr(e); }
+    catch (e) { writeErr(e); return; }
+    if (status === 'done') spawnNext(it);
   }
   async function toggleCheck(it, cid) {
     const cl = clone(it.checklist || []);
@@ -600,41 +629,144 @@ textarea.field { min-height: 120px; resize: vertical; }
     return out;
   }
   const qIn = $('quick-in');
+  const QO = { subjectId: null, due: null, kind: null };   // choices tapped on the chips
+  let qFocus = false;
+  const defaultSubject = () => (S.sel !== 'all' && S.sel !== 'mine' && subjById(S.sel)) ? S.sel : (activeSubjects()[0] && activeSubjects()[0].id);
+  async function createItem(d) {
+    const now = new Date().toISOString();
+    return S.db.collection('items').add({ kind: 'task', title: '', subjectId: defaultSubject(), due: null, status: 'todo', weight: null, assignees: [], checklist: [], files: [], body: '', repeat: null,
+      ...d, createdBy: S.meId, createdAt: now, updatedAt: now });
+  }
+  function quickParsed() {
+    const p = parseQuick(qIn.value || '');
+    if (QO.subjectId && subjById(QO.subjectId)) p.subjectId = QO.subjectId;
+    if (QO.due) p.due = QO.due;
+    if (QO.kind) p.kind = QO.kind;
+    return p;
+  }
+  function dateChoices() {
+    const t = startOfToday(); const add = n => { const d = new Date(t); d.setDate(d.getDate() + n); return iso(d); };
+    const out = [['Today', add(0)], ['Tomorrow', add(1)]];
+    for (let n = 2; n <= 6; n++) out.push([fmtDate(add(n), { weekday: 'short' }), add(n)]);
+    out.push(['Next week', add(7)]);
+    return out;
+  }
   function drawQuickPreview() {
     const box = $('quick-prev'); box.replaceChildren();
-    if (!qIn.value.trim()) return;
-    const p = parseQuick(qIn.value); const s = subjById(p.subjectId);
-    if (s) box.append(h('span', { style: `--c:${subjColor(s)}` }, h('i'), s.code || s.name));
-    box.append(h('span', { text: KINDS[p.kind] }));
-    box.append(h('span', { text: p.due ? fmtDate(p.due) : 'No due date' }));
-    if (p.me) box.append(h('span', { text: 'You' }));
-    box.append(h('span', { text: 'Enter to add' }));
+    if (!(qFocus || qIn.value.trim() || QO.subjectId || QO.due || QO.kind)) return;
+    const p = quickParsed();
+    const chip = (label, on, fn, color) => h('button', { type: 'button', class: 'qchip' + (on ? ' on' : ''), 'aria-pressed': String(on), style: color ? `--c:${color}` : null,
+      onmousedown: e => e.preventDefault(), onclick: () => { fn(); drawQuickPreview(); qIn.focus(); } }, color ? h('i') : null, label);
+    const dates = dateChoices();
+    const dateIn = h('input', { type: 'date', class: 'qdate', 'aria-label': 'Pick a date', value: p.due && !dates.some(x => x[1] === p.due) ? p.due : '',
+      onchange: e => { QO.due = e.target.value || null; drawQuickPreview(); qIn.focus(); } });
+    box.append(
+      h('div', { class: 'qgroup', 'aria-label': 'Subject' }, activeSubjects().map(s => chip(s.code || s.name, p.subjectId === s.id, () => { QO.subjectId = s.id; }, subjColor(s)))),
+      h('div', { class: 'qgroup', 'aria-label': 'Due date' }, dates.map(([l, d]) => chip(l, p.due === d, () => { QO.due = QO.due === d ? null : d; })), dateIn),
+      h('div', { class: 'qgroup', 'aria-label': 'Type' }, Object.entries(KINDS).map(([k, l]) => chip(l, p.kind === k, () => { QO.kind = k; })),
+        h('span', { class: 'sp' }),
+        h('button', { type: 'button', class: 'qlink', onmousedown: e => e.preventDefault(), onclick: () => openTemplates() }, 'Templates'),
+        h('button', { type: 'button', class: 'qlink', onmousedown: e => e.preventDefault(), onclick: () => openPasteList('') }, 'Paste a list'),
+        h('span', { class: 'qhint', text: qIn.value.trim() ? 'Enter to add' : '' })));
   }
   qIn.addEventListener('input', drawQuickPreview);
-  qIn.addEventListener('keydown', e => { if (e.key === 'Escape') { qIn.value = ''; drawQuickPreview(); } });
+  qIn.addEventListener('focus', () => { qFocus = true; drawQuickPreview(); });
+  qIn.addEventListener('blur', () => setTimeout(() => {
+    if (!$('quick').contains(document.activeElement)) { qFocus = false; if (!qIn.value.trim()) { QO.due = null; QO.kind = null; QO.subjectId = null; } drawQuickPreview(); }
+  }, 150));
+  qIn.addEventListener('keydown', e => { if (e.key === 'Escape') { qIn.value = ''; QO.due = QO.kind = QO.subjectId = null; qIn.blur(); drawQuickPreview(); } });
+  qIn.addEventListener('paste', e => {
+    const text = (e.clipboardData && e.clipboardData.getData('text')) || '';
+    if (text.split(/\r?\n/).filter(l => l.trim()).length < 2) return;
+    e.preventDefault(); openPasteList(text);
+  });
   $('quick-more').addEventListener('click', () => {
-    const p = qIn.value.trim() ? parseQuick(qIn.value) : null;
-    openItem(null, p ? { kind: p.kind, title: p.title, subjectId: p.subjectId, due: p.due, assignees: p.me && S.meId ? [S.meId] : [] } : null);
-    qIn.value = ''; drawQuickPreview();
+    const p = qIn.value.trim() ? quickParsed() : null;
+    openItem(null, p ? { kind: p.kind, title: p.title, subjectId: p.subjectId, due: p.due, assignees: p.me && S.meId ? [S.meId] : [] } : (QO.subjectId ? { subjectId: QO.subjectId } : null));
+    qIn.value = ''; QO.due = QO.kind = null; drawQuickPreview();
   });
   $('quick').addEventListener('submit', async e => {
     e.preventDefault();
     if (!canEdit() || !qIn.value.trim()) return;
-    const p = parseQuick(qIn.value);
+    const p = quickParsed();
     if (!p.subjectId) { toast('Add a subject first.'); return; }
     if (!p.title) { toast('Type a title for the item.'); return; }
-    const now = new Date().toISOString();
     try {
-      await S.db.collection('items').add({ kind: p.kind, title: p.title, subjectId: p.subjectId, due: p.due, status: 'todo', weight: null,
-        assignees: p.me && S.meId ? [S.meId] : [], checklist: [], files: [], body: '', createdBy: S.meId, createdAt: now, updatedAt: now });
+      await createItem({ kind: p.kind, title: p.title, subjectId: p.subjectId, due: p.due, assignees: p.me && S.meId ? [S.meId] : [] });
       const s = subjById(p.subjectId);
-      qIn.value = ''; drawQuickPreview(); toast(`Added to ${s ? (s.code || s.name) : 'subject'}`);
+      qIn.value = ''; QO.due = null; QO.kind = null; drawQuickPreview(); toast(`Added to ${s ? (s.code || s.name) : 'subject'}`);
     } catch (err) { writeErr(err); }
   });
+  $('fab').addEventListener('click', () => { $('quick').scrollIntoView({ behavior: 'smooth', block: 'center' }); qIn.focus(); });
+
+  // Repeating items: when one is finished, add the next one
+  async function spawnNext(it) {
+    if (!it.repeat || !it.due || it.repeatNext) return;
+    const step = d => { const x = parseISO(d); if (!x) return null;
+      if (it.repeat === 'weekly') x.setDate(x.getDate() + 7); else if (it.repeat === 'biweekly') x.setDate(x.getDate() + 14); else if (it.repeat === 'monthly') x.setMonth(x.getMonth() + 1); else return null;
+      return iso(x); };
+    const due = step(it.due); if (!due) return;
+    try {
+      const ref = await createItem({ kind: it.kind, title: it.title, subjectId: it.subjectId, due, weight: it.weight ?? null, assignees: it.assignees || [], body: it.body || '', repeat: it.repeat,
+        checklist: (it.checklist || []).map(c => ({ ...c, id: uid(), done: false, due: c.due ? step(c.due) : null })) });
+      await S.db.doc('items/' + it.id).update({ repeatNext: ref.id });
+      toast(`Next one added for ${fmtDate(due)}`);
+    } catch (e) { writeErr(e); }
+  }
+
+  // Paste several lines -> several tasks
+  function openPasteList(initial) {
+    const ta = h('textarea', { class: 'field', id: 'paste-list', placeholder: 'One task per line, e.g.\nRead chapter 4 tomorrow\nQuiz 2 friday\nTutorial 3 answers', style: 'min-height:160px' });
+    ta.value = String(initial || '').split(/\r?\n/).map(l => l.replace(/^\s*(?:[-*•▪◦]|\d+[.)]|\[[ xX]?\])\s*/, '').trim()).filter(Boolean).join('\n');
+    const subjSel = h('select', { class: 'field', id: 'paste-subject' }, activeSubjects().map(s => h('option', { value: s.id, selected: s.id === (QO.subjectId || defaultSubject()), text: s.code ? `${s.name} (${s.code})` : s.name })));
+    const prev = h('div', { class: 'paste-prev' });
+    const go = h('button', { class: 'btn primary', type: 'submit' });
+    const lines = () => ta.value.split(/\r?\n/).map(l => l.trim()).filter(Boolean).slice(0, 50);
+    const parsed = () => lines().map(l => { const p = parseQuick(l); if (!activeSubjects().some(s => (' ' + l + ' ').toLowerCase().includes(' ' + (s.code || '\u0000').toLowerCase() + ' ') || (' ' + l + ' ').toLowerCase().includes(' ' + s.name.toLowerCase() + ' '))) p.subjectId = subjSel.value; return p; }).filter(p => p.title);
+    const draw = () => {
+      const ps = parsed();
+      prev.replaceChildren(...ps.map(p => { const s = subjById(p.subjectId); return h('div', { class: 'pp' }, h('span', { class: 'tdot', style: `background:${subjColor(s)};width:7px;height:7px` }), h('span', { class: 'nm', text: p.title }), h('span', { class: 'by', text: p.due ? fmtDate(p.due) : '' })); }));
+      go.textContent = ps.length ? `Add ${ps.length} task${ps.length === 1 ? '' : 's'}` : 'Add tasks'; go.disabled = !ps.length;
+    };
+    ta.addEventListener('input', draw); subjSel.addEventListener('change', draw);
+    const form = h('form', { class: 'modal', onsubmit: async e => {
+      e.preventDefault(); const ps = parsed(); if (!ps.length) return;
+      go.disabled = true;
+      try { for (const p of ps) await createItem({ kind: p.kind, title: p.title, subjectId: p.subjectId, due: p.due, assignees: p.me && S.meId ? [S.meId] : [] }); closeP(); toast(`Added ${ps.length} task${ps.length === 1 ? '' : 's'}`); qIn.value = ''; drawQuickPreview(); }
+      catch (err) { go.disabled = false; writeErr(err); }
+    } },
+      h('h3', { text: 'Paste a list' }),
+      h('p', { text: 'Each line becomes a task. Dates like “friday” or “12/10” in a line set its due date.' }),
+      ta, h('label', { class: 'f' }, h('span', { text: 'Subject' }), subjSel), prev,
+      h('div', { style: 'display:flex;gap:8px;justify-content:flex-end' }, h('button', { class: 'btn text', type: 'button', onclick: () => closeP(), text: 'Cancel' }), go));
+    const closeP = showLayer(form, { center: true });
+    draw(); ta.focus();
+  }
+
+  // Templates: a ready-made checklist
+  const TEMPLATES = [
+    { name: 'Group assignment', kind: 'assignment', steps: ['Read the brief and split the work', 'Research and collect sources', 'Write first draft', 'Combine into one document', 'Proofread and check references', 'Submit'] },
+    { name: 'Lab report', kind: 'assignment', steps: ['Introduction and objectives', 'Method', 'Results and data tables', 'Discussion', 'Conclusion', 'References and formatting'] },
+    { name: 'Presentation', kind: 'assignment', steps: ['Outline the talk', 'Make the slides', 'Split who presents which part', 'Rehearse together', 'Final check and submit slides'] },
+    { name: 'Essay', kind: 'assignment', steps: ['Choose topic and main argument', 'Outline', 'Write the draft', 'Edit and proofread', 'Citations and formatting', 'Submit'] },
+    { name: 'Exam revision', kind: 'task', steps: ['List all topics', 'Summarize notes for each topic', 'Do past year papers', 'Go over weak topics', 'Final quick review'] },
+    { name: 'Weekly tutorial', kind: 'task', repeat: 'weekly', steps: ['Attempt all questions', 'Check answers with the team'] },
+  ];
+  function openTemplates() {
+    const form = h('div', { class: 'modal' },
+      h('h3', { text: 'Start from a template' }),
+      h('div', { class: 'tpls' }, TEMPLATES.map(t => h('button', { type: 'button', class: 'tpl', onclick: () => {
+        closeT(); qIn.value = ''; drawQuickPreview();
+        openItem(null, { kind: t.kind, title: t.name, subjectId: QO.subjectId || defaultSubject(), repeat: t.repeat || null, checklist: t.steps.map(s => ({ id: uid(), text: s, done: false, who: null, due: null })) });
+        setTimeout(() => { const ti = $('ed-title'); if (ti) ti.select(); }, 50);
+      } }, h('b', { text: t.name }), h('span', { text: `${t.steps.length} steps${t.repeat ? ' · repeats weekly' : ''}` })))),
+      h('div', { style: 'display:flex;justify-content:flex-end' }, h('button', { class: 'btn text', type: 'button', onclick: () => closeT(), text: 'Cancel' })));
+    const closeT = showLayer(form, { center: true });
+  }
 
   // ---------- sidebar ----------
   function renderSide() {
-    $('quick').hidden = !(canEdit() && activeSubjects().length && S.subjReady && !S.q);
+    $('quick').hidden = $('fab').hidden = !(canEdit() && activeSubjects().length && S.subjReady && !S.q);
   }
 
   // Subject dropdown (the page title)
@@ -691,8 +823,11 @@ textarea.field { min-height: 120px; resize: vertical; }
   let menuOpen = false;
   function renderMain() {
     const head = $('mhead'), main = $('mbody');
+    const ae = document.activeElement;
+    const kept = ae && ae.dataset && ae.dataset.keep ? { id: ae.id, value: ae.value } : null;
     head.replaceChildren(); main.replaceChildren();
-    $('quick').hidden = !(canEdit() && activeSubjects().length && S.subjReady && !S.q);
+    renderSide();
+    if (kept) requestAnimationFrame(() => { const el = $(kept.id); if (el) { el.value = kept.value; el.focus(); } });
     if (S.unavailable) {
       main.append(h('div', { class: 'empty' }, h('h3', { text: 'Sign in to open your team’s notebook' }),
         h('p', { text: 'The notebook is shared through claude.ai. Open this page while signed in.' })));
@@ -723,7 +858,7 @@ textarea.field { min-height: 120px; resize: vertical; }
 
     // Title + menu
     const menuItems = [];
-    if (canEdit()) menuItems.push(['spark', 'Plan with AI', openPlanner, !!S.sample], ['edit', 'New with details', () => openItem(null), true]);
+    if (canEdit()) menuItems.push(['spark', 'Plan with AI', openPlanner, !!S.sample], ['edit', 'New with details', () => openItem(null), true], ['list', 'From a template', openTemplates, true], ['clip', 'Paste a list', () => openPasteList(''), true]);
     if (S.downloads) menuItems.push(['down', 'Export notes', () => exportScope(subj, scope), true]);
     if (subj && canEdit()) menuItems.push(['cog', 'Edit subject', () => openSubject(subj), true]);
     const items = menuItems.filter(m => m[3]);
@@ -815,6 +950,7 @@ textarea.field { min-height: 120px; resize: vertical; }
     if (showSubj && s) m.append(h('span', { style: `--c:${subjColor(s)}` }, h('i'), s.code || s.name));
     if (it.kind !== 'task') m.append(h('span', { text: KINDS[it.kind] || 'Note' }));
     if (st === 'doing') m.append(h('span', { text: 'In progress' }));
+    if (it.repeat) m.append(h('span', { text: { weekly: 'Weekly', biweekly: 'Every 2 weeks', monthly: 'Monthly' }[it.repeat] || 'Repeats' }));
     if (cl.length) m.append(h('span', { text: `${clDone}/${cl.length} steps` }));
     if ((it.files || []).length) m.append(h('span', { title: 'Files' }, icon('clip'), String(it.files.length)));
     const ids = Array.isArray(it.assignees) ? it.assignees : [];
@@ -841,7 +977,13 @@ textarea.field { min-height: 120px; resize: vertical; }
     for (const st of STATUS) {
       const colItems = sortItems(items.filter(i => (STATUS.includes(i.status) ? i.status : 'todo') === st));
       const col = h('section', { class: 'col', 'aria-label': STATUS_LABEL[st] }, h('h4', {}, STATUS_LABEL[st], h('span', { text: colItems.length })),
-        colItems.map(it => row(it, showSubj, true)));
+        colItems.map(it => row(it, showSubj, true)),
+        canEdit() ? h('input', { class: 'col-add', id: 'keep-col-' + st, 'data-keep': '1', placeholder: '+ Add', 'aria-label': `Add to ${STATUS_LABEL[st]}`, onkeydown: async e => {
+          if (e.key !== 'Enter') return; e.preventDefault();
+          const val = e.target.value.trim(); if (!val) return;
+          const p = parseQuick(val); e.target.value = '';
+          try { await createItem({ kind: p.kind, title: p.title, subjectId: p.subjectId, due: p.due, status: st, assignees: p.me && S.meId ? [S.meId] : [] }); } catch (err) { writeErr(err); }
+        } }) : null);
       if (canEdit()) {
         col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('over'); });
         col.addEventListener('dragleave', e => { if (!col.contains(e.relatedTarget)) col.classList.remove('over'); });
@@ -872,7 +1014,8 @@ textarea.field { min-height: 120px; resize: vertical; }
       const d = new Date(start); d.setDate(start.getDate() + k);
       if (k === 35 && d.getMonth() !== m - 1) break;
       const key = iso(d); const evs = sortItems(byDay[key] || []);
-      grid.append(h('div', { class: 'day' + (d.getMonth() !== m - 1 ? ' out' : '') + (key === todayIso ? ' today' : '') + (key === S.calDay ? ' sel' : '') },
+      grid.append(h('div', { class: 'day' + (d.getMonth() !== m - 1 ? ' out' : '') + (key === todayIso ? ' today' : '') + (key === S.calDay ? ' sel' : ''),
+        onclick: e => { if (e.target.closest('button')) return; S.calDay = key; renderMain(); requestAnimationFrame(() => { const a = $('keep-cal-add'); if (a) a.focus(); }); } },
         h('button', { class: 'num', onclick: () => { S.calDay = S.calDay === key ? null : key; renderMain(); }, 'aria-label': d.toDateString() + (evs.length ? `, ${evs.length} items` : ''), text: d.getDate() }),
         evs.slice(0, 3).map(it => h('button', { class: 'ev' + (it.status === 'done' ? ' done' : ''), style: `--c:${subjColor(subjById(it.subjectId))}`, title: it.title, onclick: () => openItem(it) }, h('i'), h('span', { text: it.title }))),
         evs.length > 3 ? h('button', { class: 'ev-more', onclick: () => { S.calDay = key; renderMain(); }, text: `+${evs.length - 3}` }) : null));
@@ -884,8 +1027,16 @@ textarea.field { min-height: 120px; resize: vertical; }
       h('button', { class: 'btn text', onclick: () => { S.calMonth = null; S.calDay = null; renderMain(); }, text: 'Today' })), grid);
     if (S.calDay) {
       const evs = sortItems(byDay[S.calDay] || []);
-      main.append(h('div', { class: 'sec-h', text: fmtDate(S.calDay, { weekday: 'long', day: 'numeric', month: 'long' }) }));
-      main.append(evs.length ? h('div', { class: 'rows' }, evs.map(it => row(it, true))) : h('div', { class: 'hint', text: 'Nothing due this day.' }));
+      const dayKey = S.calDay;
+      main.append(h('div', { class: 'sec-h', text: fmtDate(dayKey, { weekday: 'long', day: 'numeric', month: 'long' }) }));
+      if (evs.length) main.append(h('div', { class: 'rows' }, evs.map(it => row(it, true))));
+      if (canEdit()) main.append(h('input', { class: 'col-add', id: 'keep-cal-add', 'data-keep': '1', placeholder: `+ Add for ${fmtDate(dayKey, { weekday: 'short', day: 'numeric', month: 'short' })}`, 'aria-label': 'Add a task for this day', onkeydown: async e => {
+        if (e.key !== 'Enter') return; e.preventDefault();
+        const val = e.target.value.trim(); if (!val) return;
+        const p = parseQuick(val); e.target.value = '';
+        try { await createItem({ kind: p.kind, title: p.title, subjectId: p.subjectId, due: dayKey, assignees: p.me && S.meId ? [S.meId] : [] }); toast(`Added for ${fmtDate(dayKey)}`); } catch (err) { writeErr(err); }
+      } }));
+      else if (!evs.length) main.append(h('div', { class: 'hint', text: 'Nothing due this day.' }));
     }
     const undated = items.filter(i => !i.due && i.status !== 'done' && i.kind !== 'note').length;
     if (undated) main.append(h('div', { class: 'hint', text: `${undated} open item${undated === 1 ? ' has' : 's have'} no due date and ${undated === 1 ? 'isn’t' : 'aren’t'} shown here.` }));
@@ -906,7 +1057,7 @@ textarea.field { min-height: 120px; resize: vertical; }
   }
 
   // ---------- item drawer ----------
-  const FIELDS = ['kind', 'title', 'subjectId', 'due', 'status', 'weight', 'assignees', 'checklist', 'files', 'body'];
+  const FIELDS = ['kind', 'title', 'subjectId', 'due', 'status', 'weight', 'assignees', 'checklist', 'files', 'body', 'repeat'];
   function openItem(it, preset) {
     const edit = canEdit();
     const isNew = !it;
@@ -1119,20 +1270,27 @@ textarea.field { min-height: 120px; resize: vertical; }
           }, text: 'Delete' }));
         return;
       }
-      if (!isNew && edit) foot.append(h('button', { class: 'btn text danger', type: 'button', onclick: () => drawFoot(true), text: 'Delete' }));
+      if (!isNew && edit) foot.append(h('button', { class: 'btn text danger', type: 'button', onclick: () => drawFoot(true), text: 'Delete' }),
+        h('button', { class: 'btn text', type: 'button', title: 'Make a copy (without files and comments)', onclick: () => {
+          const src = clone(base); close();
+          openItem(null, { kind: src.kind, title: (src.title || '') + ' (copy)', subjectId: src.subjectId, due: src.due, weight: src.weight ?? null, assignees: src.assignees || [], body: src.body || '', repeat: src.repeat || null,
+            checklist: (src.checklist || []).map(c => ({ ...c, id: uid(), done: false })) });
+        }, text: 'Duplicate' }));
       else if (!isNew && it.createdBy) foot.append(h('span', { class: 'by' }, 'Added by ', h('span', { 'data-uid': it.createdBy, text: '…' })));
       foot.append(h('span', { class: 'sp' }), h('button', { class: 'btn text', type: 'button', onclick: () => close(), text: edit ? 'Cancel' : 'Close' }), edit ? saveBtn : null);
       fillPeople(foot);
     };
     drawFoot(false);
 
+    const repeatSel = h('select', { class: 'ghost-in', id: 'ed-repeat', disabled: !edit, 'aria-label': 'Repeat' },
+      [['', 'Does not repeat'], ['weekly', 'Every week'], ['biweekly', 'Every 2 weeks'], ['monthly', 'Every month']].map(([k, l]) => h('option', { value: k, selected: (v.repeat || '') === k, text: l })));
     const form = h('form', { class: 'drawer', role: 'dialog', 'aria-modal': 'true', 'aria-label': isNew ? 'New item' : 'Item details', onsubmit: async ev => {
       ev.preventDefault();
       if (!edit) return;
       const t = title.value.trim(); if (!t) { title.focus(); toast('Give it a title.'); return; }
       if (!subjSel.value) { toast('Add a subject first.'); return; }
       const w = parseInt(weight.value, 10);
-      Object.assign(v, { title: t, subjectId: subjSel.value, due: due.value || null, status: status.value, body: body.value,
+      Object.assign(v, { repeat: repeatSel.value || null, title: t, subjectId: subjSel.value, due: due.value || null, status: status.value, body: body.value,
         weight: v.kind === 'assignment' && w >= 0 && w <= 100 ? w : null,
         checklist: v.checklist.filter(c => c.text.trim()).map(c => ({ ...c, text: c.text.trim() })) });
       const now = new Date().toISOString();
@@ -1149,6 +1307,7 @@ textarea.field { min-height: 120px; resize: vertical; }
           if (S.assets) for (const f of base.files) if (!kept.has(f.id)) { try { await S.assets.delete(f.id); } catch (e) {} }
         }
         saved = true; close(); toast(isNew ? 'Added' : 'Saved');
+        if (!isNew && v.status === 'done' && base.status !== 'done') spawnNext({ ...base, ...v, id: it.id });
       } catch (e) { saveBtn.disabled = false; writeErr(e); }
     } },
       h('div', { class: 'drawer-h' }, hereBox, h('span', { class: 'sp', style: 'flex:1' }), h('button', { class: 'iconbtn', type: 'button', 'aria-label': 'Close', onclick: () => close() }, icon('close'))),
@@ -1160,7 +1319,8 @@ textarea.field { min-height: 120px; resize: vertical; }
           h('div', { class: 'k', text: 'Due' }), h('div', { class: 'v' }, due),
           h('div', { class: 'k', text: 'Status' }), h('div', { class: 'v' }, status),
           weightK, weightV,
-          h('div', { class: 'k', text: 'People' }), h('div', { class: 'v' }, people)),
+          h('div', { class: 'k', text: 'People' }), h('div', { class: 'v' }, people),
+          h('div', { class: 'k', text: 'Repeat' }), h('div', { class: 'v' }, repeatSel)),
         h('div', { class: 'sec' }, h('div', { class: 'sec-h', text: 'Checklist' }), clBox),
         h('div', { class: 'sec' }, h('div', { class: 'sec-h' }, 'Notes', h('span', { class: 'sp' }),
           S.sample ? h('button', { class: 'lnk', type: 'button', onclick: summarize }, icon('spark'), 'Summarize') : null, previewBtn), body, preview, aiBox),
